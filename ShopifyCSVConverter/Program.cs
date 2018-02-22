@@ -16,7 +16,7 @@ namespace ShopifyCSVConverter
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new ShopifyCSVConverter());
+            Application.Run(new Converter());
         }
     }
 }
