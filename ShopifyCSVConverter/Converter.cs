@@ -18,72 +18,101 @@ namespace ShopifyCSVConverter
     public partial class Converter : Form
     {
         #region Fields
+        internal static string OpenCsvPath;
+        internal static string SaveCsvPath;
+        internal static string OpenCsvMapPath;
+        internal static string SaveCsvMapPath;
+        private DataHelper dataHelper;
+        private DataHelper DataHelper => dataHelper == null ? new DataHelper() : dataHelper;
         private bool csvNeedsSave;
         private bool csvMapNeedsSave;
-        private string openCsvPath;
-        private string openCsvMapPath;
-        private string saveCsvPath;
-        private string saveCsvMapPath;
         private Font mapFont = new Font("Arial", 10, FontStyle.Bold);
         private ComboBox[] boxes;
         private Dictionary<string, int> hash45;
         private Dictionary<string, int> hash100;
-        private Dictionary<int, string[]> originalData;        
+        private Dictionary<int, string[]> originalData;
         #endregion
+
+        protected override void OnCreateControl()
+        {
+            base.OnCreateControl();
+            this.SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.CacheText, true);
+        }
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= NativeMethods.WS_EX_COMPOSITED;
+                return cp;
+            }
+        }
+
+        public void BeginUpdate()
+        {
+            NativeMethods.SendMessage(this.Handle, NativeMethods.WM_SETREDRAW, IntPtr.Zero, IntPtr.Zero);
+        }
+
+        public void EndUpdate()
+        {
+            NativeMethods.SendMessage(this.Handle, NativeMethods.WM_SETREDRAW, new IntPtr(1), IntPtr.Zero);
+            Parent.Invalidate(true);
+        }
 
         public Converter()
         {
-            InitializeComponent();
-
+            InitializeComponent();            
             hash45 = getHash45();
             hash100 = getHash100();
 
             boxes = new ComboBox[]
             {
-                comboBox1,
-                //comboBox3,
-                //comboBox4,
-                //comboBox5,
-                //comboBox6,
-                //comboBox7,
-                //comboBox8,
-                //comboBox9,
-                //comboBox10,
-                //comboBox11,
-                //comboBox12,
-                //comboBox13,
-                //comboBox14,
-                //comboBox15,
-                //comboBox16,
-                //comboBox17,
-                //comboBox18,
-                //comboBox19,
-                //comboBox20,
-                //comboBox21,
-                //comboBox22,
-                //comboBox23,
-                //comboBox24,
-                //comboBox25,
-                //comboBox26,
-                //comboBox27,
-                //comboBox28,
-                //comboBox29,
-                //comboBox30,
-                //comboBox31,
-                //comboBox32,
-                //comboBox33,
-                //comboBox34,
-                //comboBox35,
-                //comboBox36,
-                //comboBox37,
-                //comboBox38,
-                //comboBox39,
-                //comboBox40,
-                //comboBox41,
-                //comboBox42,
-                //comboBox43,
-                //comboBox44,
-                //comboBox45
+                mapComboBox1,
+                mapComboBox2,
+                mapComboBox3,
+                mapComboBox4,
+                mapComboBox5,
+                mapComboBox6,
+                mapComboBox7,
+                mapComboBox8,
+                mapComboBox9,
+                mapComboBox10,
+                mapComboBox11,
+                mapComboBox12,
+                mapComboBox13,
+                mapComboBox14,
+                mapComboBox15,
+                mapComboBox16,
+                mapComboBox17,
+                mapComboBox18,
+                mapComboBox19,
+                mapComboBox20,
+                mapComboBox21,
+                mapComboBox22,
+                mapComboBox23,
+                mapComboBox24,
+                mapComboBox25,
+                mapComboBox26,
+                mapComboBox27,
+                mapComboBox28,
+                mapComboBox29,
+                mapComboBox30,
+                mapComboBox31,
+                mapComboBox32,
+                mapComboBox33,
+                mapComboBox34,
+                mapComboBox35,
+                mapComboBox36,
+                mapComboBox37,
+                mapComboBox38,
+                mapComboBox39,
+                mapComboBox40,
+                mapComboBox41,
+                mapComboBox42,
+                mapComboBox43,
+                mapComboBox44,
+                mapComboBox45
             };
 
             foreach (var box in boxes)
@@ -93,60 +122,43 @@ namespace ShopifyCSVConverter
                 box.DataSource = new BindingSource(getHash100(), null);
             }
 
-            updateUI();
-        }
-        #region ComboBox
-        private void comboBox_DrawItem(object sender, DrawItemEventArgs e)
-        {
-            var box = sender as ComboBox;
-            Brush foreground = new SolidBrush(e.ForeColor);
-            Brush background = new SolidBrush(Color.White);
-            var item = ((KeyValuePair<string, int>)box.Items[e.Index]).Key;
-            StringFormat stringFormat = new StringFormat();
-            stringFormat.LineAlignment = StringAlignment.Center;
-            stringFormat.Alignment = StringAlignment.Center;
-
-            if((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-            {
-                foreground = Brushes.White;
-                background = new SolidBrush(Color.Turquoise);
-            };
-            e.Graphics.FillRectangle(background, e.Bounds);
-            e.Graphics.DrawString(item, box.Font, foreground, e.Bounds, stringFormat); 
+            updateBoxes();
         }
 
-        [DllImport("user32.dll")]
-        static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, Int32 wParam, Int32 lParam);
-
-        private const Int32 CB_SETITEMHEIGHT = 0x153;
+        #region ComboBox        
 
         private void SetComboBoxHeight(IntPtr comboBoxHandle, Int32 comboBoxDesiredHeight)
         {
             SendMessage(comboBoxHandle, CB_SETITEMHEIGHT, -1, comboBoxDesiredHeight);
         }
 
+        public const Int32 CB_SETITEMHEIGHT = 0x153;
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, Int32 wParam, Int32 lParam);
+
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
 
-            // WM_SYSCOMMAND
+            
             if (m.Msg == 0x0112)
             {
-                int wParam = (m.WParam.ToInt32() & 0xFFF0);// Add double click titlebar support.
+                int wParam = (m.WParam.ToInt32() & 0xFFF0);// Maximize by double-clicking title bar
                 if (wParam == 0xF030 // Maximize event - SC_MAXIMIZE from Winuser.h
                     || wParam == 0xF120 // Restore event - SC_RESTORE from Winuser.h
-                     || wParam == 0XF020) // Minimize event - SC_MINIMIZE from Winuser.h
-                
-                {
-                    updateUI();
-                }
+                    || wParam == 0XF020) // Minimize event - SC_MINIMIZE from Winuser.h
+                    updateBoxes();                
             }
         }
 
-        private void updateUI()
+        private void updateBoxes()
         {
-            SetComboBoxHeight(comboBox1.Handle, label1.Height - 6);
-            comboBox1.Refresh();
+            foreach (var box in boxes)
+            {
+                SetComboBoxHeight(box.Handle, headerLabel1.Height - 6);
+                box.Refresh();
+            }            
         }        
 
         private Dictionary<string, int> getHash45()
@@ -317,49 +329,17 @@ namespace ShopifyCSVConverter
             DialogResult result = openCsvDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
-                openCsvPath = openCsvDialog.FileName;
-                LoadCsv();
+                OpenCsvPath = openCsvDialog.FileName;
+                dataGridView1.DataSource = DataHelper.OriginalData;
             }
-        }
-
-        private async void LoadCsv()
-        {
-            CsvParser csv;
-            originalData = new Dictionary<int, string[]>();
-            int dataIndex = 0;
-
-            try
-            {
-                using (StreamReader reader = File.OpenText(openCsvPath))
-                {                    
-                    csv = new CsvParser(reader);
-                    csv.Configuration.TrimOptions = TrimOptions.Trim | TrimOptions.Trim;
-                    csv.Read();
-                    while (true)
-                    {
-                        string[] row = await csv.ReadAsync();
-                        if (row == null || row.Length == 0) break;
-                        originalData.Add(dataIndex, row);
-                        dataIndex++;                        
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                #if DEBUG
-                MessageBox.Show($"{exception.Message} {exception.StackTrace}", $"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                #endif
-            }
-            
-            
-        }
+        }        
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DialogResult result = saveCsvDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
-                saveCsvPath = saveCsvDialog.FileName;
+                SaveCsvPath = saveCsvDialog.FileName;
                 SaveCsv();
             }
         }
@@ -382,7 +362,7 @@ namespace ShopifyCSVConverter
             {                
                 var both = csvNeedsSave && csvMapNeedsSave;
                 var fileOrFiles = both ? "files" : "file";
-                var fileNames = both ? Path.GetFileName(openCsvPath) + "\r\n" + Path.GetFileName(openCsvMapPath) : csvNeedsSave ? Path.GetFileName(openCsvPath) : Path.GetFileName(openCsvMapPath);
+                var fileNames = both ? Path.GetFileName(OpenCsvPath) + "\r\n" + Path.GetFileName(OpenCsvMapPath) : csvNeedsSave ? Path.GetFileName(OpenCsvPath) : Path.GetFileName(OpenCsvMapPath);
                 DialogResult dialogResult = MessageBox.Show($"Save changes to the following {fileOrFiles}?\n\n{fileNames}", "Shopify CSV Converter", MessageBoxButtons.YesNoCancel, 
                     MessageBoxIcon.Question, MessageBoxDefaultButton.Button3);
 
@@ -405,5 +385,19 @@ namespace ShopifyCSVConverter
             throw new NotImplementedException();
         }
         #endregion
+
+        private void Converter_DragDrop(object sender, DragEventArgs e)
+        {
+            
+        }
+    }
+
+    public static class NativeMethods
+    {
+        public static int WM_SETREDRAW = 0x000B; //uint WM_SETREDRAW
+        public static int WS_EX_COMPOSITED = 0x02000000;       
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam); 
     }
 }

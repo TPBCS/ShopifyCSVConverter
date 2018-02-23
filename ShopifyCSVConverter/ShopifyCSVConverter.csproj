@@ -48,12 +48,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataHelper.cs" />
+    <Compile Include="CustomControls.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="FieldInfoExtension.cs" />
-    <Compile Include="ShopifyCSVConverter.cs">
+    <Compile Include="Converter.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ShopifyCSVConverter.Designer.cs">
-      <DependentUpon>ShopifyCSVConverter.cs</DependentUpon>
+    <Compile Include="Converter.Designer.cs">
+      <DependentUpon>Converter.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -66,8 +70,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="ShopifyCSVConverter.resx">
-      <DependentUpon>ShopifyCSVConverter.cs</DependentUpon>
+    <EmbeddedResource Include="Converter.resx">
+      <DependentUpon>Converter.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
