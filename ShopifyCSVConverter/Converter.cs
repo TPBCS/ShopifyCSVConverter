@@ -135,12 +135,12 @@ namespace ShopifyCSVConverter
 
             foreach (var dataGridView in dataGridViews)
             {
+                if(dataGridView == dataGridView1 || dataGridView == dataGridView2) dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.ColumnHeader;
                 EnableDoubleBuffering(dataGridView);
-            }
-
+            }            
             updateBoxes();            
         }
-
+                
         private void EnableDoubleBuffering(object target)
         {
             if (!SystemInformation.TerminalServerSession)
@@ -429,7 +429,7 @@ namespace ShopifyCSVConverter
             e.Graphics.DrawString(rowIndex, new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold), SystemBrushes.ControlText, headerBounds, justifyRight);
         }
 
-        //Add letters to column headers, disable sorting and register events for width change
+        //Add letters to column headers, disable sorting
         private void dataGridView1_DataSourceChanged(object sender, EventArgs e)
         {
             DataGridView dataGridView = sender as DataGridView;
@@ -438,23 +438,24 @@ namespace ShopifyCSVConverter
             {
                 table.Columns.Add(DataHelper.GetColumnName(i));
             }
-            if(dataGridView == dataGridView1)
+            if (dataGridView == dataGridView1)
             {
+                dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
                 dataGridView4.DataSource = table;
                 disableColumnSorting(dataGridView1);
                 disableColumnSorting(dataGridView4);
                 dataGridView1.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
                 dataGridView4.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
-            }                
+            }
             else if (dataGridView == dataGridView2)
-            {                
+            {
+                dataGridView2.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
                 dataGridView3.DataSource = table;
                 disableColumnSorting(dataGridView2);
                 disableColumnSorting(dataGridView3);
                 dataGridView2.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
                 dataGridView3.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
             }
-            
         }        
 
         private void disableColumnSorting(DataGridView dataGridView)
@@ -491,6 +492,8 @@ namespace ShopifyCSVConverter
             else if (dataGridView == dataGridView4)
                 dataGridView1.Columns[e.Column.Index].Width = e.Column.Width;
         }
+
+        
     }
 
     public static class NativeMethods
