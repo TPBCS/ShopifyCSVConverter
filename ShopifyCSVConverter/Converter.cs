@@ -22,15 +22,14 @@ namespace ShopifyCSVConverter
         internal static string SaveCsvPath;
         internal static string OpenCsvMapPath;
         internal static string SaveCsvMapPath;
-        private DataHelper dataHelper;
-        private DataHelper DataHelper => dataHelper == null ? new DataHelper() : dataHelper;
         private bool csvNeedsSave;
         private bool csvMapNeedsSave;
         private Font mapFont = new Font("Arial", 10, FontStyle.Bold);
         private ComboBox[] boxes;
         private Dictionary<string, int> hash45;
         private Dictionary<string, int> hash100;
-        private Dictionary<int, string[]> originalData;
+        private DataHelper dataHelper;
+        private DataHelper DataHelper => dataHelper != null ? dataHelper : dataHelper = new DataHelper();
         #endregion
 
         protected override void OnCreateControl()
@@ -324,29 +323,30 @@ namespace ShopifyCSVConverter
         }
         #endregion
         #region Menu
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DialogResult result = openCsvDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
                 OpenCsvPath = openCsvDialog.FileName;
-                dataGridView1.DataSource = DataHelper.OriginalData;
+                dataGridView1.DataSource = await DataHelper.BuildFromCsvParser();
+
             }
         }        
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DialogResult result = saveCsvDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
                 SaveCsvPath = saveCsvDialog.FileName;
-                SaveCsv();
+                await SaveCsv();
             }
         }
 
-        private async void SaveCsv()
+        private async Task<bool> SaveCsv()
         {
-            
+            return true;
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -389,6 +389,63 @@ namespace ShopifyCSVConverter
         private void Converter_DragDrop(object sender, DragEventArgs e)
         {
             
+        }
+
+        private void dataGridView1_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
+        {
+            var grid = sender as DataGridView;
+            var rowIndex = (e.RowIndex + 1).ToString() + " ";
+
+            var rightFormat = new StringFormat()
+            {
+                // right alignment might actually make more sense for numbers
+                Alignment = StringAlignment.Far,
+                LineAlignment = StringAlignment.Center
+            };
+
+            var headerBounds = new Rectangle(e.RowBounds.Left, e.RowBounds.Top, grid.RowHeadersWidth, e.RowBounds.Height);
+            e.Graphics.DrawString(rowIndex, this.Font, SystemBrushes.ControlText, headerBounds, rightFormat);
+        }
+
+        private void dataGridView1_DataSourceChanged(object sender, EventArgs e)
+        {
+            DataGridView dataGridView = sender as DataGridView;
+            DataTable table = new DataTable("Headers");
+            for (int i = 0; i < dataGridView.ColumnCount; i++)
+            {
+                table.Columns.Add(DataHelper.GetColumnName(i));
+            }
+            if(dataGridView == dataGridView1)
+            {
+                dataGridView4.DataSource = table;
+                dataGridView4.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
+            }                
+            else if (dataGridView == dataGridView2)
+            {
+                dataGridView3.DataSource = table;
+                dataGridView3.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
+            }
+        }        
+
+        private void dataGridView1_Scroll(object sender, ScrollEventArgs e)
+        {
+            DataGridView dataGridView = sender as DataGridView;
+            if (e.ScrollOrientation == ScrollOrientation.HorizontalScroll)
+            {                
+                if (dataGridView == dataGridView1)
+                    dataGridView4.HorizontalScrollingOffset = e.NewValue;
+                else if (dataGridView == dataGridView2)
+                    dataGridView3.HorizontalScrollingOffset = e.NewValue;
+            }
+        }
+
+        private void dataGridView1_ColumnWidthChanged(object sender, DataGridViewColumnEventArgs e)
+        {
+            DataGridView dataGridView = sender as DataGridView;
+            if (dataGridView == dataGridView1)
+                dataGridView4.Columns[e.Column.Index].Width = e.Column.Width;
+            else if (dataGridView == dataGridView2)
+                dataGridView3.Columns[e.Column.Index].Width = e.Column.Width;
         }
     }
 
