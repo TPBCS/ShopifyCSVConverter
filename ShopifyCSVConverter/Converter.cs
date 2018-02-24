@@ -50,19 +50,21 @@ namespace ShopifyCSVConverter
 
         public void BeginUpdate()
         {
-            NativeMethods.SendMessage(this.Handle, NativeMethods.WM_SETREDRAW, IntPtr.Zero, IntPtr.Zero);
+            NativeMethods.SendMessage(this.Handle, NativeMethods.WM_SETREDRAW, false, 0);
         }
 
         public void EndUpdate()
         {
-            NativeMethods.SendMessage(this.Handle, NativeMethods.WM_SETREDRAW, new IntPtr(1), IntPtr.Zero);
-            Parent.Invalidate(true);
+            NativeMethods.SendMessage(this.Handle, NativeMethods.WM_SETREDRAW, true, 0);
+            Invalidate(true);
         }
 
         public Converter()
         {
-            InitializeComponent();            
+            InitializeComponent();
+            
             hash45 = getHash45();
+
             hash100 = getHash100();
 
             boxes = new ComboBox[]
@@ -119,11 +121,36 @@ namespace ShopifyCSVConverter
                 box.DisplayMember = "Key";
                 box.ValueMember = "Value";
                 box.DataSource = new BindingSource(getHash100(), null);
+                EnableDoubleBuffering(box);
+                
             }
 
-            updateBoxes();
+            var dataGridViews = new DataGridView[]
+            {
+                dataGridView1,
+                dataGridView2,
+                dataGridView3,
+                dataGridView4
+            };
+
+            foreach (var dataGridView in dataGridViews)
+            {
+                EnableDoubleBuffering(dataGridView);
+            }
+
+            updateBoxes();            
         }
 
+        private void EnableDoubleBuffering(object target)
+        {
+            if (!SystemInformation.TerminalServerSession)
+            {
+                Type dgvType = dataGridView1.GetType();
+                PropertyInfo pi = dgvType.GetProperty("DoubleBuffered",
+                  BindingFlags.Instance | BindingFlags.NonPublic);
+                pi.SetValue(target, true, null);
+            }
+        }
         #region ComboBox        
 
         private void SetComboBoxHeight(IntPtr comboBoxHandle, Int32 comboBoxDesiredHeight)
@@ -330,7 +357,6 @@ namespace ShopifyCSVConverter
             {
                 OpenCsvPath = openCsvDialog.FileName;
                 dataGridView1.DataSource = await DataHelper.BuildFromCsvParser();
-
             }
         }        
 
@@ -362,8 +388,11 @@ namespace ShopifyCSVConverter
             {                
                 var both = csvNeedsSave && csvMapNeedsSave;
                 var fileOrFiles = both ? "files" : "file";
-                var fileNames = both ? Path.GetFileName(OpenCsvPath) + "\r\n" + Path.GetFileName(OpenCsvMapPath) : csvNeedsSave ? Path.GetFileName(OpenCsvPath) : Path.GetFileName(OpenCsvMapPath);
-                DialogResult dialogResult = MessageBox.Show($"Save changes to the following {fileOrFiles}?\n\n{fileNames}", "Shopify CSV Converter", MessageBoxButtons.YesNoCancel, 
+                var fileNames = both ? Path.GetFileName(OpenCsvPath) + "\r\n" + Path.GetFileName(OpenCsvMapPath) 
+                    : csvNeedsSave ? Path.GetFileName(OpenCsvPath) : Path.GetFileName(OpenCsvMapPath);
+                DialogResult dialogResult = MessageBox.Show($"" +
+                    $"Save changes to the following {fileOrFiles}?\n\n{fileNames}", 
+                    "Shopify CSV Converter", MessageBoxButtons.YesNoCancel, 
                     MessageBoxIcon.Question, MessageBoxDefaultButton.Button3);
 
                 switch (dialogResult)
@@ -386,27 +415,21 @@ namespace ShopifyCSVConverter
         }
         #endregion
 
-        private void Converter_DragDrop(object sender, DragEventArgs e)
-        {
-            
-        }
-
+        //Display row numbers
         private void dataGridView1_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
         {
-            var grid = sender as DataGridView;
-            var rowIndex = (e.RowIndex + 1).ToString() + " ";
-
-            var rightFormat = new StringFormat()
+            var dataGridView = sender as DataGridView;
+            var rowIndex = (e.RowIndex + 1).ToString();
+            var justifyRight = new StringFormat()
             {
-                // right alignment might actually make more sense for numbers
                 Alignment = StringAlignment.Far,
                 LineAlignment = StringAlignment.Center
             };
-
-            var headerBounds = new Rectangle(e.RowBounds.Left, e.RowBounds.Top, grid.RowHeadersWidth, e.RowBounds.Height);
-            e.Graphics.DrawString(rowIndex, this.Font, SystemBrushes.ControlText, headerBounds, rightFormat);
+            var headerBounds = new Rectangle(e.RowBounds.Left, e.RowBounds.Top, dataGridView.RowHeadersWidth - 10, e.RowBounds.Height);
+            e.Graphics.DrawString(rowIndex, new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold), SystemBrushes.ControlText, headerBounds, justifyRight);
         }
 
+        //Add letters to column headers, disable sorting and register events for width change
         private void dataGridView1_DataSourceChanged(object sender, EventArgs e)
         {
             DataGridView dataGridView = sender as DataGridView;
@@ -418,15 +441,32 @@ namespace ShopifyCSVConverter
             if(dataGridView == dataGridView1)
             {
                 dataGridView4.DataSource = table;
+                disableColumnSorting(dataGridView1);
+                disableColumnSorting(dataGridView4);
+                dataGridView1.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
                 dataGridView4.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
             }                
             else if (dataGridView == dataGridView2)
-            {
+            {                
                 dataGridView3.DataSource = table;
+                disableColumnSorting(dataGridView2);
+                disableColumnSorting(dataGridView3);
+                dataGridView2.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
                 dataGridView3.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
             }
+            
         }        
 
+        private void disableColumnSorting(DataGridView dataGridView)
+        {
+            foreach (var column in dataGridView.Columns)
+            {
+                var col = column as DataGridViewColumn;
+                col.SortMode = DataGridViewColumnSortMode.NotSortable; 
+            }
+        }
+
+        //Scroll Letter headers 
         private void dataGridView1_Scroll(object sender, ScrollEventArgs e)
         {
             DataGridView dataGridView = sender as DataGridView;
@@ -446,15 +486,19 @@ namespace ShopifyCSVConverter
                 dataGridView4.Columns[e.Column.Index].Width = e.Column.Width;
             else if (dataGridView == dataGridView2)
                 dataGridView3.Columns[e.Column.Index].Width = e.Column.Width;
+            else if (dataGridView == dataGridView3)
+                dataGridView2.Columns[e.Column.Index].Width = e.Column.Width;
+            else if (dataGridView == dataGridView4)
+                dataGridView1.Columns[e.Column.Index].Width = e.Column.Width;
         }
     }
 
     public static class NativeMethods
     {
-        public static int WM_SETREDRAW = 0x000B; //uint WM_SETREDRAW
+        public static int WM_SETREDRAW = 11; //uint WM_SETREDRAW
         public static int WS_EX_COMPOSITED = 0x02000000;       
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam); 
+        public static extern IntPtr SendMessage(IntPtr hWnd, Int32 Msg, bool wParam, Int32 lParam); 
     }
 }

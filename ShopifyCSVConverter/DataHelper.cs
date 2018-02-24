@@ -91,31 +91,29 @@ namespace ShopifyCSVConverter
             using (var reader = File.OpenText(Converter.OpenCsvPath))
             {
                 using (var csv = new CsvParser(reader))
-                {
+                {                    
                     csv.Configuration.Delimiter = delimiter.ToString();
                     csv.Configuration.BadDataFound = null;
+                    csv.Configuration.BufferSize = 4096;
                     string[] headers = await csv.ReadAsync();
                     if (headers != null && headers.Length > 0)
                     {
                         try
                         {
-                            var table = new DataTable("OriginalData");
+                            var table = new DataTable();
                             for (int i = 0; i < headers.Length; i++)
                             {
-                                var header = headers[i];//"[ " + GetColumnName(i) + " ]\r\n" + 
+                                var header = headers[i];
                                 table.Columns.Add(header);
                             }
+                            table.BeginLoadData();
                             while (true)
                             {
-                                string[] record = await csv.ReadAsync();
-                                if (record == null || record.Length == 0) break;
-                                var row = table.NewRow();
-                                for (int i = 0; i < record.Length; i++)
-                                {
-                                    row[i] = record[i];
-                                }
-                                table.Rows.Add(row);
+                                var record = await csv.ReadAsync();
+                                if (record == null || record.Length == 0) break;                                
+                                table.LoadDataRow(record, true);
                             }
+                            table.EndLoadData();
                             return table;
                         }
                         catch (Exception exception)
@@ -128,48 +126,7 @@ namespace ShopifyCSVConverter
                     return null;
                 }
             }
-        }
-
-        private async Task<DataTable> buildFromCsvReader()
-        {
-            DataTable table = null;
-            using (var reader = File.OpenText(Converter.OpenCsvPath))
-            {
-                using (var csv = new CsvReader(reader))
-                {
-                    if (csv.ReadHeader())
-                    {
-                        try
-                        {
-                            table = new DataTable("OrignalData");
-                            var headers = csv.GetRecord<string[]>();
-                            for (int i = 0; i < headers.Length; i++)
-                            {
-                                var header = "( " + GetColumnName(i) + " )" + headers[i];
-                                table.Columns.Add(header);
-                            }                            
-                            while (await csv.ReadAsync())
-                            {
-                                var row = table.NewRow();
-                                foreach (DataColumn column in table.Columns)
-                                {
-                                    row[column.ColumnName] = csv.GetField(column.DataType, column.ColumnName);
-                                }
-                                table.Rows.Add(row);
-                            }
-                            return table;
-                        }
-                        catch (Exception exception)
-                        {
-                            #if DEBUG
-                            MessageBox.Show($"{exception.Message} {exception.StackTrace}", $"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            #endif
-                        }
-                    }
-                    return null;
-                }
-            }
-        }
+        }        
 
         //Method courtesy of Garran https://stackoverflow.com/questions/31974538/converting-numbers-to-excel-letter-column-vb-net#_=_ (I suck at maths(and coding))
         public static string GetColumnName(int index)

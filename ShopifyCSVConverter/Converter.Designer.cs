@@ -31,6 +31,12 @@ namespace ShopifyCSVConverter
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Converter));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
@@ -279,27 +285,55 @@ namespace ShopifyCSVConverter
             // 
             // dataGridView1
             // 
-            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(0, 20);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(0, 0, 2, 1);
             this.dataGridView1.Name = "dataGridView1";
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(0, 0, 10, 0);
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.RowHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            this.dataGridView1.RowHeadersWidth = 60;
+            this.dataGridView1.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.dataGridView1.Size = new System.Drawing.Size(1244, 583);
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.DataSourceChanged += new System.EventHandler(this.dataGridView1_DataSourceChanged);
+            this.dataGridView1.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dataGridView1_RowPostPaint);
             this.dataGridView1.Scroll += new System.Windows.Forms.ScrollEventHandler(this.dataGridView1_Scroll);
             // 
             // dataGridView4
             // 
             this.dataGridView4.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView4.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridView4.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView4.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dataGridView4.Location = new System.Drawing.Point(0, 2);
             this.dataGridView4.Margin = new System.Windows.Forms.Padding(0, 2, 2, 0);
             this.dataGridView4.Name = "dataGridView4";
+            this.dataGridView4.RowHeadersWidth = 60;
             this.dataGridView4.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.dataGridView4.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.dataGridView4.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
@@ -308,7 +342,7 @@ namespace ShopifyCSVConverter
             // 
             // tabPage2
             // 
-            this.tabPage2.BackColor = System.Drawing.Color.DarkGray;
+            this.tabPage2.BackColor = System.Drawing.Color.Transparent;
             this.tabPage2.Controls.Add(this.tableLayoutPanel2);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
@@ -319,6 +353,7 @@ namespace ShopifyCSVConverter
             // 
             // tableLayoutPanel2
             // 
+            this.tableLayoutPanel2.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.tableLayoutPanel2.BackColor = System.Drawing.Color.White;
             this.tableLayoutPanel2.ColumnCount = 8;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 361F));
@@ -328,7 +363,7 @@ namespace ShopifyCSVConverter
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 3F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 361F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 51F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel2.Controls.Add(this.mapComboBox45, 7, 28);
             this.tableLayoutPanel2.Controls.Add(this.headerLabel45, 6, 28);
             this.tableLayoutPanel2.Controls.Add(this.mapComboBox44, 4, 28);
@@ -463,40 +498,39 @@ namespace ShopifyCSVConverter
             this.tableLayoutPanel2.Controls.Add(this.mapComboBox1, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.horizontalDividerLabel1, 0, 3);
             this.tableLayoutPanel2.Controls.Add(this.horizontalDividerLabel7, 0, 7);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 29;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 3F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.666668F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(1240, 598);
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 37F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(1239, 598);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // mapComboBox45
@@ -512,7 +546,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox45.Location = new System.Drawing.Point(1190, 560);
             this.mapComboBox45.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox45.Name = "mapComboBox45";
-            this.mapComboBox45.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox45.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox45.TabIndex = 143;
             // 
             // headerLabel45
@@ -600,7 +634,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel39.Location = new System.Drawing.Point(829, 558);
             this.horizontalDividerLabel39.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel39.Name = "horizontalDividerLabel39";
-            this.horizontalDividerLabel39.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel39.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel39.TabIndex = 137;
             // 
             // horizontalDividerLabel38
@@ -638,7 +672,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox42.Location = new System.Drawing.Point(1190, 520);
             this.mapComboBox42.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox42.Name = "mapComboBox42";
-            this.mapComboBox42.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox42.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox42.TabIndex = 134;
             // 
             // headerLabel42
@@ -726,7 +760,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel36.Location = new System.Drawing.Point(829, 518);
             this.horizontalDividerLabel36.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel36.Name = "horizontalDividerLabel36";
-            this.horizontalDividerLabel36.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel36.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel36.TabIndex = 128;
             // 
             // horizontalDividerLabel35
@@ -764,7 +798,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox39.Location = new System.Drawing.Point(1190, 480);
             this.mapComboBox39.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox39.Name = "mapComboBox39";
-            this.mapComboBox39.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox39.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox39.TabIndex = 125;
             // 
             // headerLabel39
@@ -852,7 +886,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel33.Location = new System.Drawing.Point(829, 478);
             this.horizontalDividerLabel33.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel33.Name = "horizontalDividerLabel33";
-            this.horizontalDividerLabel33.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel33.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel33.TabIndex = 119;
             // 
             // horizontalDividerLabel32
@@ -890,7 +924,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox36.Location = new System.Drawing.Point(1190, 440);
             this.mapComboBox36.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox36.Name = "mapComboBox36";
-            this.mapComboBox36.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox36.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox36.TabIndex = 116;
             // 
             // headerLabel36
@@ -978,7 +1012,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel30.Location = new System.Drawing.Point(829, 438);
             this.horizontalDividerLabel30.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel30.Name = "horizontalDividerLabel30";
-            this.horizontalDividerLabel30.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel30.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel30.TabIndex = 110;
             // 
             // horizontalDividerLabel29
@@ -1016,7 +1050,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox33.Location = new System.Drawing.Point(1190, 400);
             this.mapComboBox33.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox33.Name = "mapComboBox33";
-            this.mapComboBox33.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox33.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox33.TabIndex = 107;
             // 
             // headerLabel33
@@ -1104,7 +1138,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel27.Location = new System.Drawing.Point(829, 398);
             this.horizontalDividerLabel27.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel27.Name = "horizontalDividerLabel27";
-            this.horizontalDividerLabel27.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel27.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel27.TabIndex = 101;
             // 
             // horizontalDividerLabel26
@@ -1142,7 +1176,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox30.Location = new System.Drawing.Point(1190, 360);
             this.mapComboBox30.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox30.Name = "mapComboBox30";
-            this.mapComboBox30.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox30.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox30.TabIndex = 98;
             // 
             // headerLabel30
@@ -1230,7 +1264,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel24.Location = new System.Drawing.Point(829, 358);
             this.horizontalDividerLabel24.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel24.Name = "horizontalDividerLabel24";
-            this.horizontalDividerLabel24.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel24.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel24.TabIndex = 92;
             // 
             // horizontalDividerLabel23
@@ -1268,7 +1302,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox27.Location = new System.Drawing.Point(1190, 320);
             this.mapComboBox27.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox27.Name = "mapComboBox27";
-            this.mapComboBox27.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox27.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox27.TabIndex = 89;
             // 
             // headerLabel27
@@ -1356,7 +1390,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel21.Location = new System.Drawing.Point(829, 318);
             this.horizontalDividerLabel21.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel21.Name = "horizontalDividerLabel21";
-            this.horizontalDividerLabel21.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel21.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel21.TabIndex = 83;
             // 
             // horizontalDividerLabel20
@@ -1394,7 +1428,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox24.Location = new System.Drawing.Point(1190, 280);
             this.mapComboBox24.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox24.Name = "mapComboBox24";
-            this.mapComboBox24.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox24.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox24.TabIndex = 80;
             // 
             // headerLabel24
@@ -1482,7 +1516,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel18.Location = new System.Drawing.Point(829, 278);
             this.horizontalDividerLabel18.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel18.Name = "horizontalDividerLabel18";
-            this.horizontalDividerLabel18.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel18.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel18.TabIndex = 74;
             // 
             // horizontalDividerLabel17
@@ -1520,7 +1554,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox21.Location = new System.Drawing.Point(1190, 240);
             this.mapComboBox21.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox21.Name = "mapComboBox21";
-            this.mapComboBox21.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox21.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox21.TabIndex = 71;
             // 
             // headerLabel21
@@ -1608,7 +1642,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel15.Location = new System.Drawing.Point(829, 238);
             this.horizontalDividerLabel15.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel15.Name = "horizontalDividerLabel15";
-            this.horizontalDividerLabel15.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel15.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel15.TabIndex = 65;
             // 
             // horizontalDividerLabel14
@@ -1646,7 +1680,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox18.Location = new System.Drawing.Point(1190, 200);
             this.mapComboBox18.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox18.Name = "mapComboBox18";
-            this.mapComboBox18.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox18.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox18.TabIndex = 62;
             // 
             // headerLabel18
@@ -1734,7 +1768,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel12.Location = new System.Drawing.Point(829, 198);
             this.horizontalDividerLabel12.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel12.Name = "horizontalDividerLabel12";
-            this.horizontalDividerLabel12.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel12.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel12.TabIndex = 56;
             // 
             // horizontalDividerLabel11
@@ -1772,7 +1806,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox15.Location = new System.Drawing.Point(1190, 160);
             this.mapComboBox15.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox15.Name = "mapComboBox15";
-            this.mapComboBox15.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox15.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox15.TabIndex = 53;
             // 
             // headerLabel15
@@ -1860,7 +1894,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel9.Location = new System.Drawing.Point(829, 158);
             this.horizontalDividerLabel9.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel9.Name = "horizontalDividerLabel9";
-            this.horizontalDividerLabel9.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel9.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel9.TabIndex = 47;
             // 
             // horizontalDividerLabel8
@@ -1887,7 +1921,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox12.Location = new System.Drawing.Point(1190, 120);
             this.mapComboBox12.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox12.Name = "mapComboBox12";
-            this.mapComboBox12.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox12.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox12.TabIndex = 44;
             // 
             // headerLabel12
@@ -1975,7 +2009,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel6.Location = new System.Drawing.Point(829, 118);
             this.horizontalDividerLabel6.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel6.Name = "horizontalDividerLabel6";
-            this.horizontalDividerLabel6.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel6.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel6.TabIndex = 38;
             // 
             // horizontalDividerLabel5
@@ -2013,7 +2047,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox9.Location = new System.Drawing.Point(1190, 80);
             this.mapComboBox9.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox9.Name = "mapComboBox9";
-            this.mapComboBox9.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox9.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox9.TabIndex = 35;
             // 
             // headerLabel9
@@ -2101,7 +2135,7 @@ namespace ShopifyCSVConverter
             this.horizontalDividerLabel3.Location = new System.Drawing.Point(829, 78);
             this.horizontalDividerLabel3.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.horizontalDividerLabel3.Name = "horizontalDividerLabel3";
-            this.horizontalDividerLabel3.Size = new System.Drawing.Size(411, 2);
+            this.horizontalDividerLabel3.Size = new System.Drawing.Size(410, 2);
             this.horizontalDividerLabel3.TabIndex = 29;
             // 
             // horizontalDividerLabel2
@@ -2128,7 +2162,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox6.Location = new System.Drawing.Point(1190, 40);
             this.mapComboBox6.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox6.Name = "mapComboBox6";
-            this.mapComboBox6.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox6.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox6.TabIndex = 27;
             // 
             // headerLabel6
@@ -2221,7 +2255,7 @@ namespace ShopifyCSVConverter
             this.mapComboBox3.Location = new System.Drawing.Point(1190, 0);
             this.mapComboBox3.Margin = new System.Windows.Forms.Padding(1, 0, 0, 0);
             this.mapComboBox3.Name = "mapComboBox3";
-            this.mapComboBox3.Size = new System.Drawing.Size(50, 27);
+            this.mapComboBox3.Size = new System.Drawing.Size(49, 27);
             this.mapComboBox3.TabIndex = 21;
             // 
             // headerLabel3
@@ -2278,7 +2312,7 @@ namespace ShopifyCSVConverter
             this.label6.Location = new System.Drawing.Point(829, 38);
             this.label6.Margin = new System.Windows.Forms.Padding(1, 1, 0, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(411, 2);
+            this.label6.Size = new System.Drawing.Size(410, 2);
             this.label6.TabIndex = 14;
             // 
             // label5
@@ -2405,8 +2439,15 @@ namespace ShopifyCSVConverter
             // 
             // dataGridView2
             // 
-            this.dataGridView2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.ColumnHeader;
             this.dataGridView2.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView2.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView2.Location = new System.Drawing.Point(0, 20);
@@ -2414,6 +2455,7 @@ namespace ShopifyCSVConverter
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.Size = new System.Drawing.Size(1244, 583);
             this.dataGridView2.TabIndex = 0;
+            this.dataGridView2.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dataGridView1_RowPostPaint);
             // 
             // dataGridView3
             // 
@@ -2422,11 +2464,27 @@ namespace ShopifyCSVConverter
             this.dataGridView3.AllowUserToResizeColumns = false;
             this.dataGridView3.AllowUserToResizeRows = false;
             this.dataGridView3.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView3.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridView3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView3.Location = new System.Drawing.Point(0, 2);
             this.dataGridView3.Margin = new System.Windows.Forms.Padding(0, 2, 2, 0);
             this.dataGridView3.Name = "dataGridView3";
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView3.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridView3.ScrollBars = System.Windows.Forms.ScrollBars.None;
             this.dataGridView3.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dataGridView3.Size = new System.Drawing.Size(1244, 18);
@@ -2559,14 +2617,10 @@ namespace ShopifyCSVConverter
             this.ClientSize = new System.Drawing.Size(1264, 681);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.textBox1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.HelpButton = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "Converter";
-            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Shopify CSV Converter";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ShopifyCSVConverter_FormClosing);
