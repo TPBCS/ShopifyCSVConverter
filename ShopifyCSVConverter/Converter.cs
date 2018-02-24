@@ -17,52 +17,22 @@ namespace ShopifyCSVConverter
 {
     public partial class Converter : Form
     {
-        #region Fields
         internal static string OpenCsvPath;
         internal static string SaveCsvPath;
         internal static string OpenCsvMapPath;
         internal static string SaveCsvMapPath;
         private bool csvNeedsSave;
         private bool csvMapNeedsSave;
-        private Font mapFont = new Font("Arial", 10, FontStyle.Bold);
         private ComboBox[] boxes;
         private Dictionary<string, int> hash45;
         private Dictionary<string, int> hash100;
         private DataHelper dataHelper;
         private DataHelper DataHelper => dataHelper != null ? dataHelper : dataHelper = new DataHelper();
-        #endregion
-
-        protected override void OnCreateControl()
-        {
-            base.OnCreateControl();
-            this.SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.CacheText, true);
-        }
-
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                CreateParams cp = base.CreateParams;
-                cp.ExStyle |= NativeMethods.WS_EX_COMPOSITED;
-                return cp;
-            }
-        }
-
-        public void BeginUpdate()
-        {
-            NativeMethods.SendMessage(this.Handle, NativeMethods.WM_SETREDRAW, false, 0);
-        }
-
-        public void EndUpdate()
-        {
-            NativeMethods.SendMessage(this.Handle, NativeMethods.WM_SETREDRAW, true, 0);
-            Invalidate(true);
-        }
 
         public Converter()
         {
             InitializeComponent();
-            
+
             hash45 = getHash45();
 
             hash100 = getHash100();
@@ -122,7 +92,7 @@ namespace ShopifyCSVConverter
                 box.ValueMember = "Value";
                 box.DataSource = new BindingSource(getHash100(), null);
                 EnableDoubleBuffering(box);
-                
+
             }
 
             var dataGridViews = new DataGridView[]
@@ -135,10 +105,52 @@ namespace ShopifyCSVConverter
 
             foreach (var dataGridView in dataGridViews)
             {
-                if(dataGridView == dataGridView1 || dataGridView == dataGridView2) dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.ColumnHeader;
+                if (dataGridView == dataGridView1 || dataGridView == dataGridView2) dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.ColumnHeader;
                 EnableDoubleBuffering(dataGridView);
-            }            
-            updateBoxes();            
+            }
+            UpdateBoxes();
+        }
+
+        protected override void OnCreateControl()
+        {
+            base.OnCreateControl();
+            this.SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.CacheText, true);
+        }
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= WS_EX_COMPOSITED;
+                return cp;
+            }
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+
+
+            if (m.Msg == 0x0112)
+            {
+                int wParam = (m.WParam.ToInt32() & 0xFFF0);// Maximize by double-clicking title bar
+                if (wParam == 0xF030 // Maximize event - SC_MAXIMIZE from Winuser.h
+                    || wParam == 0xF120 // Restore event - SC_RESTORE from Winuser.h
+                    || wParam == 0XF020) // Minimize event - SC_MINIMIZE from Winuser.h
+                    UpdateBoxes();
+            }
+        }
+
+        public void BeginUpdate()
+        {
+            NativeMethod.SendMessage(this.Handle, WM_SETREDRAW, false, 0);
+        }
+
+        public void EndUpdate()
+        {
+            NativeMethod.SendMessage(this.Handle, WM_SETREDRAW, true, 0);
+            Invalidate(true);
         }
                 
         private void EnableDoubleBuffering(object target)
@@ -151,314 +163,27 @@ namespace ShopifyCSVConverter
                 pi.SetValue(target, true, null);
             }
         }
-        #region ComboBox        
 
-        private void SetComboBoxHeight(IntPtr comboBoxHandle, Int32 comboBoxDesiredHeight)
-        {
-            SendMessage(comboBoxHandle, CB_SETITEMHEIGHT, -1, comboBoxDesiredHeight);
-        }
-
-        public const Int32 CB_SETITEMHEIGHT = 0x153;
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, Int32 wParam, Int32 lParam);
-
-        protected override void WndProc(ref Message m)
-        {
-            base.WndProc(ref m);
-
-            
-            if (m.Msg == 0x0112)
-            {
-                int wParam = (m.WParam.ToInt32() & 0xFFF0);// Maximize by double-clicking title bar
-                if (wParam == 0xF030 // Maximize event - SC_MAXIMIZE from Winuser.h
-                    || wParam == 0xF120 // Restore event - SC_RESTORE from Winuser.h
-                    || wParam == 0XF020) // Minimize event - SC_MINIMIZE from Winuser.h
-                    updateBoxes();                
-            }
-        }
-
-        private void updateBoxes()
+        private void UpdateBoxes()
         {
             foreach (var box in boxes)
             {
-                SetComboBoxHeight(box.Handle, headerLabel1.Height - 6);
+                NativeMethod.SendMessage(box.Handle, CB_SETITEMHEIGHT, false, headerLabel1.Height - 6);
                 box.Refresh();
-            }            
-        }        
-
-        private Dictionary<string, int> getHash45()
-        {
-            return new Dictionary<string, int>()
-            {
-                [""] = 0,
-                ["A"] = 1,
-                ["B"] = 2,
-                ["C"] = 3,
-                ["D"] = 4,
-                ["E"] = 5,
-                ["F"] = 6,
-                ["G"] = 7,
-                ["H"] = 8,
-                ["I"] = 9,
-                ["J"] = 10,
-                ["K"] = 11,
-                ["L"] = 12,
-                ["M"] = 13,
-                ["N"] = 14,
-                ["O"] = 15,
-                ["P"] = 16,
-                ["Q"] = 17,
-                ["R"] = 18,
-                ["S"] = 19,
-                ["T"] = 20,
-                ["U"] = 21,
-                ["V"] = 22,
-                ["W"] = 23,
-                ["X"] = 24,
-                ["Y"] = 25,
-                ["Z"] = 26,
-                ["AA"] = 27,
-                ["AB"] = 28,
-                ["AC"] = 29,
-                ["AD"] = 30,
-                ["AE"] = 31,
-                ["AF"] = 32,
-                ["AG"] = 33,
-                ["AH"] = 34,
-                ["AI"] = 35,
-                ["AJ"] = 36,
-                ["AK"] = 37,
-                ["AL"] = 38,
-                ["AM"] = 39,
-                ["AN"] = 40,
-                ["AO"] = 41,
-                ["AP"] = 42,
-                ["AQ"] = 43,
-                ["AR"] = 44,
-                ["AS"] = 45,
-                ["AT"] = 46
-            };
-        }
-
-        internal static Dictionary<string, int> getHash100()
-        {
-            return new Dictionary<string, int>()
-            {
-                [""] = 0,
-                ["A"] = 1,
-                ["B"] = 2,
-                ["C"] = 3,
-                ["D"] = 4,
-                ["E"] = 5,
-                ["F"] = 6,
-                ["G"] = 7,
-                ["H"] = 8,
-                ["I"] = 9,
-                ["J"] = 10,
-                ["K"] = 11,
-                ["L"] = 12,
-                ["M"] = 13,
-                ["N"] = 14,
-                ["O"] = 15,
-                ["P"] = 16,
-                ["Q"] = 17,
-                ["R"] = 18,
-                ["S"] = 19,
-                ["T"] = 20,
-                ["U"] = 21,
-                ["V"] = 22,
-                ["W"] = 23,
-                ["X"] = 24,
-                ["Y"] = 25,
-                ["Z"] = 26,
-                ["AA"] = 27,
-                ["AB"] = 28,
-                ["AC"] = 29,
-                ["AD"] = 30,
-                ["AE"] = 31,
-                ["AF"] = 32,
-                ["AG"] = 33,
-                ["AH"] = 34,
-                ["AI"] = 35,
-                ["AJ"] = 36,
-                ["AK"] = 37,
-                ["AL"] = 38,
-                ["AM"] = 39,
-                ["AN"] = 40,
-                ["AO"] = 41,
-                ["AP"] = 42,
-                ["AQ"] = 43,
-                ["AR"] = 44,
-                ["AS"] = 45,
-                ["AT"] = 46,
-                ["AU"] = 47,
-                ["AV"] = 48,
-                ["AW"] = 49,
-                ["AX"] = 50,
-                ["AY"] = 51,
-                ["AZ"] = 52,
-                ["BA"] = 53,
-                ["BB"] = 54,
-                ["BC"] = 55,
-                ["BD"] = 56,
-                ["BE"] = 57,
-                ["BF"] = 58,
-                ["BG"] = 59,
-                ["BH"] = 60,
-                ["BI"] = 61,
-                ["BJ"] = 62,
-                ["BK"] = 63,
-                ["BL"] = 64,
-                ["BM"] = 65,
-                ["BN"] = 66,
-                ["BO"] = 67,
-                ["BP"] = 68,
-                ["BQ"] = 69,
-                ["BR"] = 70,
-                ["BS"] = 71,
-                ["BT"] = 72,
-                ["BU"] = 73,
-                ["BV"] = 74,
-                ["BW"] = 75,
-                ["BX"] = 76,
-                ["BY"] = 77,
-                ["BZ"] = 78,
-                ["CA"] = 79,
-                ["CB"] = 80,
-                ["CC"] = 81,
-                ["CD"] = 82,
-                ["CE"] = 83,
-                ["CF"] = 84,
-                ["CG"] = 85,
-                ["CH"] = 86,
-                ["CI"] = 87,
-                ["CJ"] = 88,
-                ["CK"] = 89,
-                ["CL"] = 90,
-                ["CM"] = 91,
-                ["CN"] = 92,
-                ["CO"] = 93,
-                ["CP"] = 94,
-                ["CQ"] = 95,
-                ["CR"] = 96,
-                ["CS"] = 97,
-                ["CT"] = 98,
-                ["CU"] = 99,
-                ["CV"] = 100
-            };
-        }
-        #endregion
-        #region Menu
-        private async void openToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            DialogResult result = openCsvDialog.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                OpenCsvPath = openCsvDialog.FileName;
-                dataGridView1.DataSource = await DataHelper.BuildFromCsvParser();
-            }
-        }        
-
-        private async void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            DialogResult result = saveCsvDialog.ShowDialog();
-            if (result == DialogResult.OK)
-            {
-                SaveCsvPath = saveCsvDialog.FileName;
-                await SaveCsv();
             }
         }
-
+        
         private async Task<bool> SaveCsv()
         {
             return true;
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-        #endregion
-
-        #region PromptForSave
-        private void ShopifyCSVConverter_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (csvNeedsSave || csvMapNeedsSave)
-            {                
-                var both = csvNeedsSave && csvMapNeedsSave;
-                var fileOrFiles = both ? "files" : "file";
-                var fileNames = both ? Path.GetFileName(OpenCsvPath) + "\r\n" + Path.GetFileName(OpenCsvMapPath) 
-                    : csvNeedsSave ? Path.GetFileName(OpenCsvPath) : Path.GetFileName(OpenCsvMapPath);
-                DialogResult dialogResult = MessageBox.Show($"" +
-                    $"Save changes to the following {fileOrFiles}?\n\n{fileNames}", 
-                    "Shopify CSV Converter", MessageBoxButtons.YesNoCancel, 
-                    MessageBoxIcon.Question, MessageBoxDefaultButton.Button3);
-
-                switch (dialogResult)
-                {                    
-                    case DialogResult.Cancel:
-                        e.Cancel = true;
-                        break;                    
-                    case DialogResult.Yes:
-                        Save();
-                        break;
-                    case DialogResult.No:
-                        break;
-                }
-            }
-        }
-
         private void Save()
         {
             throw new NotImplementedException();
-        }
-        #endregion
+        }     
 
-        //Display row numbers
-        private void dataGridView1_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
-        {
-            var dataGridView = sender as DataGridView;
-            var rowIndex = (e.RowIndex + 1).ToString();
-            var justifyRight = new StringFormat()
-            {
-                Alignment = StringAlignment.Far,
-                LineAlignment = StringAlignment.Center
-            };
-            var headerBounds = new Rectangle(e.RowBounds.Left, e.RowBounds.Top, dataGridView.RowHeadersWidth - 10, e.RowBounds.Height);
-            e.Graphics.DrawString(rowIndex, new Font("Microsoft Sans Serif", 8.25f, FontStyle.Bold), SystemBrushes.ControlText, headerBounds, justifyRight);
-        }
-
-        //Add letters to column headers, disable sorting
-        private void dataGridView1_DataSourceChanged(object sender, EventArgs e)
-        {
-            DataGridView dataGridView = sender as DataGridView;
-            DataTable table = new DataTable("Headers");
-            for (int i = 0; i < dataGridView.ColumnCount; i++)
-            {
-                table.Columns.Add(DataHelper.GetColumnName(i));
-            }
-            if (dataGridView == dataGridView1)
-            {
-                dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-                dataGridView4.DataSource = table;
-                disableColumnSorting(dataGridView1);
-                disableColumnSorting(dataGridView4);
-                dataGridView1.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
-                dataGridView4.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
-            }
-            else if (dataGridView == dataGridView2)
-            {
-                dataGridView2.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-                dataGridView3.DataSource = table;
-                disableColumnSorting(dataGridView2);
-                disableColumnSorting(dataGridView3);
-                dataGridView2.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
-                dataGridView3.ColumnWidthChanged += new DataGridViewColumnEventHandler(dataGridView1_ColumnWidthChanged);
-            }
-        }        
-
-        private void disableColumnSorting(DataGridView dataGridView)
+        private void DisableColumnSorting(DataGridView dataGridView)
         {
             foreach (var column in dataGridView.Columns)
             {
@@ -466,42 +191,11 @@ namespace ShopifyCSVConverter
                 col.SortMode = DataGridViewColumnSortMode.NotSortable; 
             }
         }
-
-        //Scroll Letter headers 
-        private void dataGridView1_Scroll(object sender, ScrollEventArgs e)
-        {
-            DataGridView dataGridView = sender as DataGridView;
-            if (e.ScrollOrientation == ScrollOrientation.HorizontalScroll)
-            {                
-                if (dataGridView == dataGridView1)
-                    dataGridView4.HorizontalScrollingOffset = e.NewValue;
-                else if (dataGridView == dataGridView2)
-                    dataGridView3.HorizontalScrollingOffset = e.NewValue;
-            }
-        }
-
-        private void dataGridView1_ColumnWidthChanged(object sender, DataGridViewColumnEventArgs e)
-        {
-            DataGridView dataGridView = sender as DataGridView;
-            if (dataGridView == dataGridView1)
-                dataGridView4.Columns[e.Column.Index].Width = e.Column.Width;
-            else if (dataGridView == dataGridView2)
-                dataGridView3.Columns[e.Column.Index].Width = e.Column.Width;
-            else if (dataGridView == dataGridView3)
-                dataGridView2.Columns[e.Column.Index].Width = e.Column.Width;
-            else if (dataGridView == dataGridView4)
-                dataGridView1.Columns[e.Column.Index].Width = e.Column.Width;
-        }
-
-        
     }
 
-    public static class NativeMethods
+    public static class NativeMethod
     {
-        public static int WM_SETREDRAW = 11; //uint WM_SETREDRAW
-        public static int WS_EX_COMPOSITED = 0x02000000;       
-
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, Int32 Msg, bool wParam, Int32 lParam); 
+        public static extern IntPtr SendMessage(IntPtr hWnd, Int32 Msg, bool wParam, Int32 lParam);
     }
 }
