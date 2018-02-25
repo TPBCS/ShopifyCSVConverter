@@ -13,7 +13,7 @@ namespace ShopifyCSVConverter
     public partial class Converter
     {
 
-        //load map
+        //save map
         private void saveMapToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string path = "";
@@ -86,8 +86,46 @@ namespace ShopifyCSVConverter
             if (result == DialogResult.OK)
             {
                 OpenCsvPath = openCsvDialog.FileName;
-                dataGridView1.DataSource = await DataHelper.BuildFromCsvParser();
+                toolStripStatusLabel1.Text = "Loading";
+                toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
+                toolStripProgressBar1.Visible = true;
+                originalDataTable = await LoadCsv();
+                toolStripProgressBar1.Visible = false;
+                toolStripStatusLabel1.Text = "Ready";
+                dataGridView1.DataSource = originalDataTable;                
             }
+        }
+        //convert
+        private void convertToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            toolStripStatusLabel1.Text = "Converting";
+            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+            toolStripProgressBar1.Visible = true;
+            toolStripProgressBar1.Maximum = originalDataTable.Rows.Count;
+            toolStripProgressBar1.Step = 1;
+
+            newDataTable = new DataTable();
+            foreach (var column in shopifyColumns)
+            {
+                newDataTable.Columns.Add(column);
+            }
+            newDataTable.BeginLoadData();            
+            foreach (var row in originalDataTable.Rows)
+            {
+                var rowItems = (string[])row;
+                var newRowItems = new string[boxes.Length];
+                for (int i = 0; i < boxes.Length; i++)  
+                {
+                    var key = boxes[i].GetItemText(boxes[i].SelectedItem);
+                    newRowItems[i] = rowItems[hash100[key]];
+                }
+                newDataTable.LoadDataRow(newRowItems, true);
+                toolStripProgressBar1.PerformStep();
+            }
+            newDataTable.EndLoadData();
+            dataGridView2.DataSource = newDataTable;
+            toolStripProgressBar1.Visible = false;
+            toolStripStatusLabel1.Text = "Ready";
         }
         //Save converted file
         private async void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -151,7 +189,7 @@ namespace ShopifyCSVConverter
             DataTable table = new DataTable("Headers");
             for (int i = 0; i < dataGridView.ColumnCount; i++)
             {
-                table.Columns.Add(DataHelper.GetColumnName(i));
+                table.Columns.Add(GetColumnName(i));
             }
             if (dataGridView == dataGridView1)
             {

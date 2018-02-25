@@ -11,6 +11,55 @@ namespace ShopifyCSVConverter
         public const int WM_SETREDRAW = 11;
         public const int WS_EX_COMPOSITED = 0x02000000;
         public const Int32 CB_SETITEMHEIGHT = 0x153;
+        private static string[] shopifyColumns = new string[]
+        {
+            "Handle",
+            "Title",
+            "Body (HTML)",
+            "Vendor",
+            "Type",
+            "Tags",
+            "Published",
+            "Option 1 Name",
+            "Option 1 Value",
+            "Option 2 Name",
+            "Option 2 Value",
+            "Option 3 Name",
+            "Option 3 Value",
+            "SKU",
+            "Variant Grams",
+            "Variant Inventory Tracker",
+            "Variant Inventory Qty",
+            "Variant Inventory Policy",
+            "Variant Fulfilment Service",
+            "Variant Price",
+            "Variant Compare At Price",
+            "Varian Requires Shipping",
+            "Variant Taxable",
+            "Variant Barcode",
+            "Image Src",
+            "Image Alt Text",
+            "GiftCard",
+            "Google Shopping / MPN",
+            "Google Shopping / Age Group",
+            "Google Shopping / Gender",
+            "Google Shopping / Google Product Category",
+            "SEO Title",
+            "SEO Description",
+            "Google Shopping / AdWords Grouping",
+            "Google Shopping / AdWords Labels",
+            "Google Shopping / Condition",
+            "Google Shopping / Custom Product",
+            "Google Shopping / Custom Label 0",
+            "Google Shopping / Custom Label 1",
+            "Google Shopping / Custom Label 2",
+            "Google Shopping / Custom Label 3",
+            "Google Shopping / Custom Label 4",
+            "Variant Image",
+            "Variant Weight Unit",
+            "Collection"
+        };
+
         private Dictionary<string, int> getHash45()
         {
             return new Dictionary<string, int>()

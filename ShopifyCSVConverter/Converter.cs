@@ -26,8 +26,8 @@ namespace ShopifyCSVConverter
         private ComboBox[] boxes;
         private Dictionary<string, int> hash45;
         private Dictionary<string, int> hash100;
-        private DataHelper dataHelper;
-        private DataHelper DataHelper => dataHelper != null ? dataHelper : dataHelper = new DataHelper();
+        private DataTable originalDataTable;
+        private DataTable newDataTable;
 
         public Converter()
         {

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace ShopifyCSVConverter
 {
-    public class DataHelper
+    public partial class Converter
     {
         //method courtesy of Josip Kremenic https://www.codeproject.com/Articles/231582/Auto-detect-CSV-separator
         public static char Detect(TextReader reader, int rowCount, IList<char> separators)
@@ -81,14 +81,14 @@ namespace ShopifyCSVConverter
             return maxCount == 0 ? '\0' : separators[separatorsCount.IndexOf(maxCount)];
         }
 
-        public async Task<DataTable> BuildFromCsvParser()
+        public async Task<DataTable> LoadCsv()
         {
             char delimiter;
-            using (var textReader = File.OpenText(Converter.OpenCsvPath))
+            using (var textReader = File.OpenText(OpenCsvPath))
             {
                 delimiter = Detect(textReader, 5, ",|\t#.:;".ToCharArray());                
             }
-            using (var reader = File.OpenText(Converter.OpenCsvPath))
+            using (var reader = File.OpenText(OpenCsvPath))
             {
                 using (var csv = new CsvParser(reader))
                 {                    
