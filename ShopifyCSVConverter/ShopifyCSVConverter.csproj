@@ -48,17 +48,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Constants.cs">
+    <Compile Include="Converter.Constants.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DataHelper.cs" />
+    <Compile Include="Converter.Helper.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="CustomControls.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Events.cs">
+    <Compile Include="Converter.Events.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FieldInfoExtension.cs" />
     <Compile Include="Converter.cs">
       <SubType>Form</SubType>
     </Compile>

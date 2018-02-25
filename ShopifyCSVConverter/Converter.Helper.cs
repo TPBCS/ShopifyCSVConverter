@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -144,36 +143,11 @@ namespace ShopifyCSVConverter
             return columnName;
         }
 
-        //        private async void LoadCsv()
-        //        {
-        //            CsvParser csv;
-        //            int dataIndex = 0;
+        private async Task<bool> SaveCsv()
+        {
+            csvNeedsSave = false;
 
-        //            try
-        //            {
-        //                using (StreamReader reader = File.OpenText(OpenCsvPath))
-        //                {
-        //                    csv = new CsvParser(reader);
-        //                    csv.Configuration.TrimOptions = TrimOptions.Trim | TrimOptions.Trim;
-        //                    csv.Read();
-        //                    while (true)
-        //                    {
-        //                        string[] row = await csv.ReadAsync();
-        //                        if (row == null || row.Length == 0) break;
-        //                        originalData.Add(dataIndex, row);
-        //                        dataIndex++;
-        //                    }
-        //                }
-        //            }
-        //            catch (Exception exception)
-        //            {
-        //#if DEBUG
-        //                MessageBox.Show($"{exception.Message} {exception.StackTrace}", $"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //#endif
-        //            }
-
-
-
-        //        }
+            return true;
+        }        
     }
 }

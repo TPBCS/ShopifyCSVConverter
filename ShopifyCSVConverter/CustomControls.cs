@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ShopifyCSVConverter
@@ -36,6 +32,8 @@ namespace ShopifyCSVConverter
             this.Margin = new Padding(1, 0, 0, 0);
             this.Size = new Size(49, 27);
             this.DrawItem += new DrawItemEventHandler(this.comboBox_DrawItem);
+            this.DropDownHeight = 300;
+            this.IntegralHeight = false;
         }
 
         private void comboBox_DrawItem(object sender, DrawItemEventArgs e)

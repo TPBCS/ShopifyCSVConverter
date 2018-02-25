@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CsvHelper;
-using CsvHelper.Configuration;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -97,18 +91,20 @@ namespace ShopifyCSVConverter
 
             var dataGridViews = new DataGridView[]
             {
-                dataGridView1,
-                dataGridView2,
-                dataGridView3,
-                dataGridView4
+                dataGridViewLetterHeaders,
+                dataGridViewOriginal,
+                dataGridViewConverted
             };
-
+            //gets called when data is not yet bound so cant deal with columns and rows here
             foreach (var dataGridView in dataGridViews)
             {
-                if (dataGridView == dataGridView1 || dataGridView == dataGridView2) dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.ColumnHeader;
+                if (dataGridView == dataGridViewOriginal || dataGridView == dataGridViewConverted) dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.ColumnHeader;                
                 EnableDoubleBuffering(dataGridView);
             }
+
             UpdateBoxes();
+            
+            toolStripProgressBar1.Visible = false;
         }
 
         protected override void OnCreateControl()
@@ -144,12 +140,12 @@ namespace ShopifyCSVConverter
 
         public void BeginUpdate()
         {
-            NativeMethod.SendMessage(this.Handle, WM_SETREDRAW, false, 0);
+            NativeMethods.SendMessage(this.Handle, WM_SETREDRAW, false, 0);
         }
 
         public void EndUpdate()
         {
-            NativeMethod.SendMessage(this.Handle, WM_SETREDRAW, true, 0);
+            NativeMethods.SendMessage(this.Handle, WM_SETREDRAW, true, 0);
             Invalidate(true);
         }
                 
@@ -157,7 +153,7 @@ namespace ShopifyCSVConverter
         {
             if (!SystemInformation.TerminalServerSession)
             {
-                Type dgvType = dataGridView1.GetType();
+                Type dgvType = dataGridViewOriginal.GetType();
                 PropertyInfo pi = dgvType.GetProperty("DoubleBuffered",
                   BindingFlags.Instance | BindingFlags.NonPublic);
                 pi.SetValue(target, true, null);
@@ -168,20 +164,10 @@ namespace ShopifyCSVConverter
         {
             foreach (var box in boxes)
             {
-                NativeMethod.SendMessage(box.Handle, CB_SETITEMHEIGHT, -1, headerLabel1.Height - 6);
+                NativeMethods.SendMessage(box.Handle, CB_SETITEMHEIGHT, -1, headerLabel1.Height - 6);
                 box.Refresh();
             }
-        }
-        
-        private async Task<bool> SaveCsv()
-        {
-            return true;
-        }
-
-        private void Save()
-        {
-            throw new NotImplementedException();
-        }     
+        }             
 
         private void DisableColumnSorting(DataGridView dataGridView)
         {
@@ -191,9 +177,62 @@ namespace ShopifyCSVConverter
                 col.SortMode = DataGridViewColumnSortMode.NotSortable; 
             }
         }
+
+
+        private async void Save()
+        {
+            toolStripStatusLabel1.Text = "Saving";
+            if (csvNeedsSave && csvMapNeedsSave)
+            {
+                await SaveCsv();
+                await SaveCsvMap();
+            }
+            else if (csvMapNeedsSave)
+            {
+                await SaveCsvMap();
+            }
+            else if(csvNeedsSave)
+            {
+                await SaveCsv();
+            }
+            toolStripStatusLabel1.Text = "Ready";
+        }
+
+        private async Task<bool> SaveCsvMap()
+        {
+            csvMapNeedsSave = false;                        
+
+            if (!(saveCsvMapDialog.ShowDialog() == DialogResult.OK)) return false;
+
+            SaveCsvMapPath = saveCsvMapDialog.FileName;            
+
+            string[] boxItems = new string[boxes.Length];
+
+            for (int i = 0; i < boxes.Length; i++)
+            {
+                boxItems[i] = boxes[i].GetItemText(boxes[i].SelectedItem);
+            }
+
+            try
+            {
+                using (FileStream stream = new FileStream(SaveCsvMapPath, FileMode.Create, FileAccess.Write))
+                {
+                    using (StreamWriter writer = new StreamWriter(stream))
+                    {
+                        await writer.WriteLineAsync(string.Join(",", boxItems));
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);                
+            }
+            return false;
+        }
     }
 
-    public static class NativeMethod
+    public static class NativeMethods
     {
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, bool wParam, Int32 lParam);
