@@ -11,7 +11,6 @@ namespace ShopifyCSVConverter
         public const int WM_SETREDRAW = 11;
         public const int WS_EX_COMPOSITED = 0x02000000;
         public const Int32 CB_SETITEMHEIGHT = 0x153;
-
         private Dictionary<string, int> getHash45()
         {
             return new Dictionary<string, int>()

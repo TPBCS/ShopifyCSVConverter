@@ -13,6 +13,72 @@ namespace ShopifyCSVConverter
     public partial class Converter
     {
 
+        //load map
+        private void saveMapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string path = "";
+
+            if (saveCsvMapDialog.ShowDialog() == DialogResult.OK)
+            {
+                path = saveCsvMapDialog.FileName;
+            }
+            else return;
+
+            string[] boxItems = new string[boxes.Length];
+
+            for (int i = 0; i < boxes.Length; i++)
+            {
+                boxItems[i] = boxes[i].GetItemText(boxes[i].SelectedItem);
+            }
+
+            try
+            {
+                using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write))
+                {
+                    using (StreamWriter writer = new StreamWriter(stream))
+                    {                        
+                        writer.WriteLine(string.Join(",", boxItems));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + ex.StackTrace);
+            }
+        }
+        //load map
+        private void loadMapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string path = "";
+
+            if (openCsvMapDialog.ShowDialog() == DialogResult.OK)
+            {
+                path = openCsvMapDialog.FileName;
+            }
+            else return;
+
+            List<string[]> parsedData = new List<string[]>();
+
+            try
+            {
+                using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+                {
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        var boxItems = reader.ReadLine().Split(new string[] {","}, StringSplitOptions.None);
+                        
+                        for (int i = 0; i < boxes.Length; i++)
+                        {
+                            boxes[i].SelectedIndex = hash45[boxItems[i]];
+                        }
+                    }                    
+                }
+            }
+            catch (Exception)
+            {
+                
+            }
+        }
         //load original file
         private async void openToolStripMenuItem_Click(object sender, EventArgs e)
         {

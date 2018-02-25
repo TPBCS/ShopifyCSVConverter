@@ -168,7 +168,7 @@ namespace ShopifyCSVConverter
         {
             foreach (var box in boxes)
             {
-                NativeMethod.SendMessage(box.Handle, CB_SETITEMHEIGHT, false, headerLabel1.Height - 6);
+                NativeMethod.SendMessage(box.Handle, CB_SETITEMHEIGHT, -1, headerLabel1.Height - 6);
                 box.Refresh();
             }
         }
@@ -196,6 +196,9 @@ namespace ShopifyCSVConverter
     public static class NativeMethod
     {
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, Int32 Msg, bool wParam, Int32 lParam);
+        public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, bool wParam, Int32 lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, Int32 wParam, Int32 lParam);
     }
 }
