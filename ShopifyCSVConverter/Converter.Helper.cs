@@ -1,9 +1,12 @@
 ﻿using CsvHelper;
+using CsvHelper.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -88,44 +91,90 @@ namespace ShopifyCSVConverter
                 delimiter = Detect(textReader, 5, ",|\t#.:;".ToCharArray());                
             }
             using (var reader = File.OpenText(OpenCsvPath))
-            {
-                using (var csv = new CsvParser(reader))
-                {                    
-                    csv.Configuration.Delimiter = delimiter.ToString();
-                    csv.Configuration.BadDataFound = null;
-                    csv.Configuration.BufferSize = 4096;
-                    string[] headers = await csv.ReadAsync();
-                    if (headers != null && headers.Length > 0)
+            using (var csv = new CsvParser(reader))
+            {                                    
+                csv.Configuration.Delimiter = delimiter.ToString();
+                csv.Configuration.BadDataFound = null;
+                csv.Configuration.BufferSize = 4096;
+                string[] headers = await csv.ReadAsync();
+                if (headers != null && headers.Length > 0)
+                {
+                    try
                     {
-                        try
+                        var table = new DataTable();
+                        for (int i = 0; i < headers.Length; i++)
                         {
-                            var table = new DataTable();
-                            for (int i = 0; i < headers.Length; i++)
-                            {
-                                var header = headers[i];
-                                table.Columns.Add(header);
-                            }
-                            table.BeginLoadData();
-                            while (true)
-                            {
-                                var record = await csv.ReadAsync();
-                                if (record == null || record.Length == 0) break;                                
-                                table.LoadDataRow(record, true);
-                            }
-                            table.EndLoadData();
-                            return table;
+                            var header = headers[i];
+                            table.Columns.Add(header);
                         }
-                        catch (Exception exception)
+                        table.BeginLoadData();
+                        #if DEBUG
+                        var stopWatch = new Stopwatch();
+                        stopWatch.Start();
+                        #endif
+                        while (true)
                         {
-                            #if DEBUG
-                            MessageBox.Show($"{exception.Message} {exception.StackTrace}", $"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            #endif
+                            var record = await csv.ReadAsync();
+                            if (record == null || record.Length == 0) break;                                
+                            table.LoadDataRow(record, true);
                         }
+                        #if DEBUG
+                        stopWatch.Stop();
+                        MessageBox.Show($"It took: {stopWatch.Elapsed.ToString()}");
+                        #endif
+                        table.EndLoadData();
+                        return table;
                     }
-                    return null;
+                    catch (Exception) { }
                 }
+                return null;                
             }
-        }        
+        }
+
+        public async Task<DataTable> LoadCsv1()
+        {
+            char delimiter;
+            using (var textReader = File.OpenText(OpenCsvPath))
+            {
+                delimiter = Detect(textReader, 5, ",|\t#.:;".ToCharArray());
+            }
+            using (var reader = File.OpenText(OpenCsvPath))
+            using (var csv = new CsvReader(reader, new Configuration() { Delimiter = delimiter.ToString(), BadDataFound = null, BufferSize = 4096}))
+            {
+                try
+                {
+                    var dataTable = new DataTable();
+                    csv.Read();
+                    csv.ReadHeader();
+                    foreach (var header in csv.Context.HeaderRecord)
+                    {
+                        dataTable.Columns.Add(header);
+                    }
+                    dataTable.BeginLoadData();
+                    #if DEBUG
+                    var stopWatch = new Stopwatch();
+                    stopWatch.Start();
+                    #endif
+                    while (await csv.ReadAsync())
+                    {
+                        var row = new string[dataTable.Columns.Count];
+                        for (int i = 0; i < row.Length; i++)
+                        {
+                            row[i] = csv.GetField<string>(i);
+                        }
+                        dataTable.LoadDataRow(row, true);
+                    };
+                    #if DEBUG
+                    stopWatch.Stop();
+                    MessageBox.Show($"It took: {stopWatch.Elapsed.ToString()}");
+                    #endif
+                    dataTable.EndLoadData();
+                    return dataTable;
+                }
+                catch (Exception) { }
+                return null;
+            }
+        }
 
         //Method courtesy of Garran https://stackoverflow.com/questions/31974538/converting-numbers-to-excel-letter-column-vb-net#_=_ (I suck at maths(and coding))
         public static string GetColumnName(int index)
@@ -145,9 +194,44 @@ namespace ShopifyCSVConverter
 
         private async Task<bool> SaveCsv()
         {
-            csvNeedsSave = false;
-
-            return true;
+            toolStripStatusLabel1.Text = "Saving";
+            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
+            toolStripProgressBar1.Visible = true;
+            toolStripProgressBar1.Maximum = newDataTable.Rows.Count;
+            toolStripProgressBar1.Step = 1;
+            using (var dataTable = new DataTable())
+            using (var reader = new DataTableReader(newDataTable))
+            using (var stream = File.Create(SaveCsvPath, 4096, FileOptions.SequentialScan))
+            using (var csv = new CsvWriter(new StreamWriter(stream), new Configuration() { Encoding = Encoding.UTF8,
+                BufferSize = 4096, TrimOptions = TrimOptions.Trim | TrimOptions.InsideQuotes }))
+            {
+                try
+                {
+                    dataTable.Load(reader);
+                    foreach (DataColumn column in dataTable.Columns)
+                    {
+                        csv.WriteField(column.ColumnName);
+                    }
+                    await csv.NextRecordAsync();
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        for (var i = 0; i < dataTable.Columns.Count; i++)
+                        {
+                            csv.WriteField(row[i]);
+                        }
+                        await csv.NextRecordAsync();
+                        toolStripProgressBar1.PerformStep();
+                    }
+                    csvNeedsSave = false;
+                    toolStripProgressBar1.Visible = false;
+                    toolStripStatusLabel1.Text = "Ready";
+                    return true;
+                }
+                catch (Exception) { }
+            }
+            toolStripProgressBar1.Visible = false;
+            toolStripStatusLabel1.Text = "Ready";
+            return false;
         }        
     }
 }

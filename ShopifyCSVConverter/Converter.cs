@@ -86,7 +86,7 @@ namespace ShopifyCSVConverter
                 box.ValueMember = "Value";
                 box.DataSource = new BindingSource(getHash100(), null);
                 EnableDoubleBuffering(box);
-
+                box.SelectedValueChanged += ComboBox_ValueChanged;
             }
 
             var dataGridViews = new DataGridView[]
@@ -126,8 +126,6 @@ namespace ShopifyCSVConverter
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
-
-
             if (m.Msg == 0x0112)
             {
                 int wParam = (m.WParam.ToInt32() & 0xFFF0);// Maximize by double-clicking title bar
@@ -224,10 +222,7 @@ namespace ShopifyCSVConverter
                 }
                 return true;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message + ex.StackTrace);                
-            }
+            catch (Exception) { }
             return false;
         }
     }

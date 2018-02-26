@@ -124,7 +124,7 @@ namespace ShopifyCSVConverter
                 rowData = new Dictionary<string, string>();
                 for (int i = 0; i < data.Length; i++)
                 {
-                    rowData.Add(Columns[i], data[i] == null ? "" : data[i]);
+                    rowData.Add(Columns[i], data[i] ?? "");
                 }
             }
 
