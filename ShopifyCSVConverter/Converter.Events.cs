@@ -4,17 +4,17 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ShopifyCSVConverter
 {
     public partial class Converter
     {
-
         //save map
-        private async void SaveMapToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveMapToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            await SaveCsvMap();
+            SaveCsvMap();
         }
         //load map
         private void LoadMapToolStripMenuItem_Click(object sender, EventArgs e)
@@ -35,6 +35,7 @@ namespace ShopifyCSVConverter
                             {
                                 boxes[i].SelectedIndex = hash45[boxItems[i]];
                             }
+                            csvMapNeedsSave = false;
                         }
                     }
                 }
@@ -51,60 +52,72 @@ namespace ShopifyCSVConverter
                 toolStripStatusLabel1.Text = "Loading";
                 toolStripProgressBar1.Style = ProgressBarStyle.Marquee;
                 toolStripProgressBar1.Visible = true;
-                originalDataTable = await LoadCsv();
+                originalDataTable = await Task.Run(()=> LoadCsv());
                 dataGridViewOriginal.DataSource = originalDataTable;
                 FormatColumns(dataGridViewOriginal);
                 toolStripProgressBar1.Visible = false;
-                toolStripStatusLabel1.Text = "Ready";                  
+                toolStripStatusLabel1.Text = "Ready";
+                csvLoaded = true;
             }
         }
         //convert
-        private void ConvertToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void ConvertToolStripMenuItem_Click(object sender, EventArgs e)
         {
             csvNeedsSave = true;
             toolStripStatusLabel1.Text = "Converting";
-            toolStripProgressBar1.Style = ProgressBarStyle.Continuous;
-            toolStripProgressBar1.Visible = true;
+            toolStripProgressBar1.Style = ProgressBarStyle.Blocks;
             toolStripProgressBar1.Maximum = originalDataTable.Rows.Count;
             toolStripProgressBar1.Step = 1;
+            toolStripProgressBar1.Visible = true;
             newDataTable = new DataTable();
             foreach (var column in shopifyColumns)
             {
                 newDataTable.Columns.Add(column);
             }
-            newDataTable.BeginLoadData();            
-            foreach (var row in originalDataTable.Rows)
+            newDataTable.BeginLoadData();
+            var boxIndexes = new int[boxes.Length];
+            var boxValues = new string[boxes.Length];
+            for (int i = 0; i < boxes.Length; i++)
             {
-                try
-                {
-                    var rowItems = ((DataRow)row).ItemArray.Cast<string>().ToArray();
-                    var newRowItems = new string[boxes.Length];
-                    for (int i = 0; i < boxes.Length; i++)
-                    {
-                        if (boxes[i].SelectedIndex == 0) continue;
-                        var key = boxes[i].GetItemText(boxes[i].SelectedItem);
-                        newRowItems[i] = rowItems[hash100[key] - 1];
-                    }
-                    newDataTable.LoadDataRow(newRowItems, true);
-                    toolStripProgressBar1.PerformStep();
-                }
-                catch (Exception) { }
+                boxIndexes[i] = boxes[i].SelectedIndex;
+                boxValues[i] = boxes[i].GetItemText(boxes[i].SelectedItem);
             }
+            await Task.Run(() => 
+            {
+                foreach (var row in originalDataTable.Rows)
+                {
+                    try
+                    {
+                        var rowItems = ((DataRow)row).ItemArray.Cast<string>().ToArray();
+                        var newRowItems = new string[boxes.Length];
+                        for (int i = 0; i < boxes.Length; i++)
+                        {
+                            if (boxIndexes[i] == 0) continue;
+                            var key = boxValues[i];
+                            newRowItems[i] = rowItems[hash100[key] - 1];
+                        }
+                        newDataTable.LoadDataRow(newRowItems, true);
+                        if(toolStripProgressBar1.GetCurrentParent().InvokeRequired) toolStripProgressBar1.GetCurrentParent().Invoke((Action)(() => toolStripProgressBar1.PerformStep()));
+                    }
+                    catch (Exception) { }
+                }
+            });            
             newDataTable.EndLoadData();
             dataGridViewConverted.DataSource = newDataTable;
             FormatColumns(dataGridViewConverted);            
             toolStripProgressBar1.Visible = false;
             toolStripStatusLabel1.Text = "Ready";
+            saveToolStripMenuItem.Enabled = true;
         }
-
+        //Set column width to column content width or 200, whichever is less
         private void FormatColumns(DataGridView dataGridView)
         {
             for (int i = 0; i < dataGridView.Columns.Count; i++)
             {
                 var column = dataGridView.Columns[i];
                 var width = TextRenderer.MeasureText(column.HeaderText, dataGridView.ColumnHeadersDefaultCellStyle.Font).Width;
-                column.Width = width > 200 ? 200 : width;
                 column.MinimumWidth = 50;
+                column.Width = width > 200 ? 200 : width;
             }
             var n = dataGridView.RowCount < 100 ? dataGridView.RowCount : 100;
             for (int i = 0; i < n; i++)
@@ -114,27 +127,31 @@ namespace ShopifyCSVConverter
                     var cells = (dataGridView.Rows[i]).Cells;
                     for (int j = 0; j < cells.Count; j++)
                     {
+                        var column = dataGridView.Columns[j];
+                        column.SortMode = DataGridViewColumnSortMode.NotSortable;
                         var cell = (dataGridView.Rows[i]).Cells[j];
                         if (cell.Value == null || cell == null || cell.Value == DBNull.Value) continue;
-                        var column = dataGridView.Columns[j];
                         var width = TextRenderer.MeasureText((string)cell.Value, cell.Style.Font).Width;
-                        column.Width = width > 200 ? 200 : width > column.Width ? width : column.Width;
                         column.MinimumWidth = 50;
-                        column.SortMode = DataGridViewColumnSortMode.NotSortable;
+                        column.Width = width > 200 ? 200 : width > column.Width ? width : column.Width;
                     }
                 }
-                catch (Exception) { }                
+                catch (Exception ex)
+                {
+#if DEBUG
+                    MessageBox.Show($"{ex.Message} {ex.StackTrace}", "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+#endif
+                }                
             }
         }
         //Save converted file
-        private async void SaveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             DialogResult result = saveCsvDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
                 SaveCsvPath = saveCsvDialog.FileName;
-                toolStripStatusLabel1.Text = "Saving";
-                if(await SaveCsv()) toolStripStatusLabel1.Text = "Ready";
+                SaveCsv();
             }
         }
         //Exit menu item
@@ -149,9 +166,9 @@ namespace ShopifyCSVConverter
             {
                 var both = csvNeedsSave && csvMapNeedsSave;
                 var fileOrFiles = both ? "files" : "file";
-                var fileNames = both ? (Path.GetFileName(SaveCsvPath) == "" ? "converted.csv" : Path.GetFileName(SaveCsvPath))
+                var fileNames = both ? (Path.GetFileName(SaveCsvPath) == null || Path.GetFileName(SaveCsvPath) == "" ? "converted.csv" : Path.GetFileName(SaveCsvPath))
                     + Environment.NewLine + (Path.GetFileName(OpenCsvMapPath) == null || Path.GetFileName(OpenCsvMapPath) == "" ? "csv-map.sccm" : Path.GetFileName(OpenCsvMapPath))
-                    : csvNeedsSave ? (Path.GetFileName(SaveCsvPath) == "" ? "converted.csv" : Path.GetFileName(SaveCsvPath))
+                    : csvNeedsSave ? (Path.GetFileName(SaveCsvPath) == null || Path.GetFileName(SaveCsvPath) == "" ? "converted.csv" : Path.GetFileName(SaveCsvPath))
                     : (Path.GetFileName(OpenCsvMapPath) == null || Path.GetFileName(OpenCsvMapPath) == "" ? "csv-map.sccm" : Path.GetFileName(OpenCsvMapPath));
                 DialogResult dialogResult = MessageBox.Show($"" +
                     $"Save changes to the following {fileOrFiles}?" + Environment.NewLine + $"{fileNames}",
@@ -237,6 +254,7 @@ namespace ShopifyCSVConverter
         //Turn save flag on when a box is changed
         private void ComboBox_ValueChanged(object sender, EventArgs e)
         {
+            convertToolStripMenuItem.Enabled = CanConvert();
             csvMapNeedsSave = true;
         }
     }

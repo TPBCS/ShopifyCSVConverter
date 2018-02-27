@@ -17,6 +17,7 @@ namespace ShopifyCSVConverter
         internal static string SaveCsvMapPath;
         private bool csvNeedsSave;
         private bool csvMapNeedsSave;
+        private bool csvLoaded;
         private ComboBox[] boxes;
         private Dictionary<string, int> hash45;
         private Dictionary<string, int> hash100;
@@ -103,9 +104,11 @@ namespace ShopifyCSVConverter
             }
 
             UpdateBoxes();
-            
+
+            convertToolStripMenuItem.Enabled = CanConvert();
+            saveToolStripMenuItem.Enabled = false;
             toolStripProgressBar1.Visible = false;
-        }
+        }        
 
         protected override void OnCreateControl()
         {
@@ -182,48 +185,54 @@ namespace ShopifyCSVConverter
             toolStripStatusLabel1.Text = "Saving";
             if (csvNeedsSave && csvMapNeedsSave)
             {
-                await SaveCsv();
-                await SaveCsvMap();
+                await Task.Run(() => { SaveCsvMap(); SaveCsv(); });
             }
             else if (csvMapNeedsSave)
             {
-                await SaveCsvMap();
+                await Task.Run(() => SaveCsvMap());
             }
             else if(csvNeedsSave)
             {
-                await SaveCsv();
+                await Task.Run(() => SaveCsv());
             }
             toolStripStatusLabel1.Text = "Ready";
         }
 
-        private async Task<bool> SaveCsvMap()
+        private void SaveCsvMap()
         {
             csvMapNeedsSave = false;                        
 
-            if (!(saveCsvMapDialog.ShowDialog() == DialogResult.OK)) return false;
-
-            SaveCsvMapPath = saveCsvMapDialog.FileName;            
-
-            string[] boxItems = new string[boxes.Length];
-
-            for (int i = 0; i < boxes.Length; i++)
+            if ((saveCsvMapDialog.ShowDialog() == DialogResult.OK))
             {
-                boxItems[i] = boxes[i].GetItemText(boxes[i].SelectedItem);
-            }
+                SaveCsvMapPath = saveCsvMapDialog.FileName;
 
-            try
-            {
-                using (FileStream stream = new FileStream(SaveCsvMapPath, FileMode.Create, FileAccess.Write))
+                string[] boxItems = new string[boxes.Length];
+
+                for (int i = 0; i < boxes.Length; i++)
                 {
-                    using (StreamWriter writer = new StreamWriter(stream))
-                    {
-                        await writer.WriteLineAsync(string.Join(",", boxItems));
-                    }
+                    boxItems[i] = boxes[i].GetItemText(boxes[i].SelectedItem);
                 }
-                return true;
-            }
-            catch (Exception) { }
-            return false;
+
+                try
+                {
+                    using (FileStream stream = new FileStream(SaveCsvMapPath, FileMode.Create, FileAccess.Write))
+                    {
+                        using (StreamWriter writer = new StreamWriter(stream))
+                        {
+                           writer.WriteLine(string.Join(",", boxItems));
+                        }
+                    }
+
+                }
+                catch (Exception) { }
+            } 
+        }
+
+        private bool CanConvert()
+        {
+            var anyBoxLoaded = false;
+            foreach (var box in boxes) if (box.SelectedIndex > 0) anyBoxLoaded = true;
+            return anyBoxLoaded && csvLoaded;
         }
     }
 
