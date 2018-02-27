@@ -28,9 +28,9 @@ namespace ShopifyCSVConverter
         {
             InitializeComponent();
 
-            hash45 = getHash45();
+            hash45 = GetHash45();
 
-            hash100 = getHash100();
+            hash100 = GetHash100();
 
             boxes = new ComboBox[]
             {
@@ -85,7 +85,7 @@ namespace ShopifyCSVConverter
             {
                 box.DisplayMember = "Key";
                 box.ValueMember = "Value";
-                box.DataSource = new BindingSource(getHash100(), null);
+                box.DataSource = new BindingSource(GetHash100(), null);
                 EnableDoubleBuffering(box);
                 box.SelectedValueChanged += ComboBox_ValueChanged;
             }
@@ -141,12 +141,12 @@ namespace ShopifyCSVConverter
 
         public void BeginUpdate()
         {
-            NativeMethods.SendMessage(this.Handle, WM_SETREDRAW, false, 0);
+            NativeMethods.SendMessage(this.Handle, WM_SETREDRAW, 0, 0);
         }
 
         public void EndUpdate()
         {
-            NativeMethods.SendMessage(this.Handle, WM_SETREDRAW, true, 0);
+            NativeMethods.SendMessage(this.Handle, WM_SETREDRAW, 1, 0);
             Invalidate(true);
         }
                 
@@ -212,19 +212,21 @@ namespace ShopifyCSVConverter
                 {
                     boxItems[i] = boxes[i].GetItemText(boxes[i].SelectedItem);
                 }
-
+                
+                FileStream stream = null;
                 try
                 {
-                    using (FileStream stream = new FileStream(SaveCsvMapPath, FileMode.Create, FileAccess.Write))
+                    stream = new FileStream(SaveCsvMapPath, FileMode.Create, FileAccess.Write);                    
+                    using (StreamWriter writer = new StreamWriter(stream))
                     {
-                        using (StreamWriter writer = new StreamWriter(stream))
-                        {
-                           writer.WriteLine(string.Join(",", boxItems));
-                        }
+                        stream = null;
+                        writer.WriteLine(string.Join(",", boxItems));
                     }
-
                 }
-                catch (Exception) { }
+                finally
+                {
+                    if (stream != null) stream.Dispose();
+                }                
             } 
         }
 
@@ -236,12 +238,14 @@ namespace ShopifyCSVConverter
         }
     }
 
-    public static class NativeMethods
+    internal static class NativeMethods
     {
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, bool wParam, Int32 lParam);
+        internal static extern IntPtr SendMessage(IntPtr hWnd, int Msg, IntPtr wParam, IntPtr lParam);
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, Int32 wParam, Int32 lParam);
+        internal static void SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam)
+        {
+            SendMessage(hWnd, Msg, (IntPtr)wParam, (IntPtr)lParam);
+        }
     }
 }

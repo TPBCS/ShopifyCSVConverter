@@ -7,7 +7,7 @@ namespace ShopifyCSVConverter
     {
         public const int WM_SETREDRAW = 11;
         public const int WS_EX_COMPOSITED = 0x02000000;
-        public const Int32 CB_SETITEMHEIGHT = 0x153;
+        public const int CB_SETITEMHEIGHT = 0x153;
         private static string[] shopifyColumns = new string[]
         {
             "Handle",
@@ -57,7 +57,7 @@ namespace ShopifyCSVConverter
             "Collection"
         };
 
-        private Dictionary<string, int> getHash45()
+        private Dictionary<string, int> GetHash45()
         {
             return new Dictionary<string, int>()
             {
@@ -70,7 +70,7 @@ namespace ShopifyCSVConverter
             };
         }
 
-        internal static Dictionary<string, int> getHash100()
+        internal static Dictionary<string, int> GetHash100()
         {
             return new Dictionary<string, int>()
             {

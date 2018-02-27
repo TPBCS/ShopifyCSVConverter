@@ -25,10 +25,13 @@ namespace ShopifyCSVConverter
                 List<string[]> parsedData = new List<string[]>();
                 try
                 {
-                    using (var stream = new FileStream(OpenCsvMapPath, FileMode.Open, FileAccess.Read))
+                    Stream stream = null;
+                    try
                     {
+                        stream = new FileStream(OpenCsvMapPath, FileMode.Open, FileAccess.Read);
                         using (StreamReader reader = new StreamReader(stream))
                         {
+                            stream = null;
                             var boxItems = reader.ReadLine().Split(new string[] { "," }, StringSplitOptions.None);
 
                             for (int i = 0; i < boxes.Length; i++)
@@ -38,6 +41,10 @@ namespace ShopifyCSVConverter
                             csvMapNeedsSave = false;
                         }
                     }
+                    finally
+                    {
+                        if (stream != null) stream.Dispose();
+                    }                    
                 }
                 catch (Exception) { }
             }

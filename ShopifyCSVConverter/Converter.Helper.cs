@@ -80,41 +80,50 @@ namespace ShopifyCSVConverter
         public DataTable LoadCsv()
         {
             char delimiter;
+            DataTable table = null;
             using (var textReader = File.OpenText(OpenCsvPath))
             {
                 delimiter = Detect(textReader, 5, new char[] { char.Parse(","), char.Parse("|"), char.Parse(":"), char.Parse(";"), char.Parse("\t") });                
             }
-            using (var reader = File.OpenText(OpenCsvPath))
-            using (var csv = new CsvParser(reader))
-            {                                    
-                csv.Configuration.Delimiter = delimiter.ToString();
-                csv.Configuration.BadDataFound = null;
-                csv.Configuration.BufferSize = 4096;
-                string[] headers = csv.Read();
-                if (headers != null && headers.Length > 0)
+            StreamReader reader = null;
+            try
+            {
+                reader = File.OpenText(OpenCsvPath);
+                using (var csv = new CsvParser(reader))
                 {
-                    try
+                    reader = null;
+                    csv.Configuration.Delimiter = delimiter.ToString();
+                    csv.Configuration.BadDataFound = null;
+                    csv.Configuration.BufferSize = 4096;
+                    string[] headers = csv.Read();
+                    if (headers != null && headers.Length > 0)
                     {
-                        var table = new DataTable();
-                        for (int i = 0; i < headers.Length; i++)
+                        try
                         {
-                            var header = headers[i];
-                            table.Columns.Add(header);
+                            table = new DataTable();
+                            for (int i = 0; i < headers.Length; i++)
+                            {
+                                var header = headers[i];
+                                table.Columns.Add(header);
+                            }
+                            table.BeginLoadData();
+                            while (true)
+                            {
+                                var record = csv.Read();
+                                if (record == null || record.Length == 0) break;
+                                table.LoadDataRow(record, true);
+                            }
+                            table.EndLoadData();
                         }
-                        table.BeginLoadData();
-                        while (true)
-                        {
-                            var record = csv.Read();
-                            if (record == null || record.Length == 0) break;                                
-                            table.LoadDataRow(record, true);
-                        }
-                        table.EndLoadData();
-                        return table;
+                        catch (Exception) { }
                     }
-                    catch (Exception) { }
                 }
-                return null;                
             }
+            finally
+            {
+                if (reader != null) reader.Dispose();
+            }
+            return table;                
         }
         //Method courtesy of Garran https://stackoverflow.com/questions/31974538/converting-numbers-to-excel-letter-column-vb-net#_=_ (I suck at maths(and coding))
         public static string GetColumnName(int index)
