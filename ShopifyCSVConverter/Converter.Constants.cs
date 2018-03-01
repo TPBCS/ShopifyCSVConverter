@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ShopifyCSVConverter
 {
@@ -26,7 +25,7 @@ namespace ShopifyCSVConverter
             "SKU",
             "Variant Grams",
             "Variant Inventory Tracker",
-            "Variant Inventory Qty",
+            "Variant Inventory Quantity",
             "Variant Inventory Policy",
             "Variant Fulfilment Service",
             "Variant Price",

@@ -91,15 +91,16 @@ namespace ShopifyCSVConverter
                 reader = File.OpenText(OpenCsvPath);
                 using (var csv = new CsvParser(reader))
                 {
-                    reader = null;
-                    csv.Configuration.Delimiter = delimiter.ToString();
-                    csv.Configuration.BadDataFound = null;
-                    csv.Configuration.BufferSize = 4096;
-                    string[] headers = csv.Read();
-                    if (headers != null && headers.Length > 0)
+                    try
                     {
-                        try
+                        reader = null;
+                        csv.Configuration.Delimiter = delimiter.ToString();
+                        csv.Configuration.BadDataFound = null;
+                        csv.Configuration.BufferSize = 4096;
+                        string[] headers = csv.Read();
+                        if (headers != null && headers.Length > 0)
                         {
+
                             table = new DataTable();
                             for (int i = 0; i < headers.Length; i++)
                             {
@@ -115,8 +116,11 @@ namespace ShopifyCSVConverter
                             }
                             table.EndLoadData();
                         }
-                        catch (Exception) { }
                     }
+                    catch (Exception exception)
+                    {
+                        MessageBox.Show($"{exception.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }                    
                 }
             }
             finally

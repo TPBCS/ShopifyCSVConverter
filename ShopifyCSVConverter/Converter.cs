@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Linq;
+using System.Globalization;
 
 namespace ShopifyCSVConverter
 {
@@ -96,7 +97,7 @@ namespace ShopifyCSVConverter
                 dataGridViewOriginal,
                 dataGridViewConverted
             };
-            //gets called when data is not yet bound so cant deal with columns and rows here
+
             foreach (var dataGridView in dataGridViews)
             {
                 if (dataGridView == dataGridViewOriginal || dataGridView == dataGridViewConverted) dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.ColumnHeader;                
@@ -179,22 +180,18 @@ namespace ShopifyCSVConverter
             }
         }
 
-
-        private async void Save()
+        private void Save()
         {
+            SaveCsvPath = Path.Combine(Application.StartupPath, "converted.csv");
+            SaveCsvMapPath = Path.Combine(Application.StartupPath, "csv-map.sccm");
             toolStripStatusLabel1.Text = "Saving";
             if (csvNeedsSave && csvMapNeedsSave)
             {
-                await Task.Run(() => { SaveCsvMap(); SaveCsv(); });
+                SaveCsvMap();
+                SaveCsv();
             }
-            else if (csvMapNeedsSave)
-            {
-                await Task.Run(() => SaveCsvMap());
-            }
-            else if(csvNeedsSave)
-            {
-                await Task.Run(() => SaveCsv());
-            }
+            else if (csvMapNeedsSave) SaveCsvMap(); 
+            else if (csvNeedsSave) SaveCsv();
             toolStripStatusLabel1.Text = "Ready";
         }
 
@@ -229,12 +226,86 @@ namespace ShopifyCSVConverter
                 }                
             } 
         }
-
         private bool CanConvert()
         {
             var anyBoxLoaded = false;
             foreach (var box in boxes) if (box.SelectedIndex > 0) anyBoxLoaded = true;
             return anyBoxLoaded && csvLoaded;
+        }
+        //Capitalize Words
+        private string CapitalizeWords(string sentenceOrWord)
+        {
+            if (string.IsNullOrWhiteSpace(sentenceOrWord)) return sentenceOrWord;
+            var stringArray = sentenceOrWord.Split(char.Parse(" "));
+            for (int i = 0; i < stringArray.Length; i++)
+            {
+                stringArray[i] = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(stringArray[i].ToLower());
+            }
+            return string.Join(" ", stringArray);
+        }
+        //Format Tags
+        private string FormatTags(string tags)
+        {
+            tags = tags.Replace("&", "And");
+            var tagsArray = tags.Split(char.Parse(","));
+            var newTagsArray = new List<string>();
+            foreach (var tag in tagsArray)
+            {
+                var tagArray = tag.Split(char.Parse(" "));
+                var newTagArray = new List<string>(); 
+                foreach (var str in tagArray)
+                {
+                    newTagArray.Add(str.ToLower().Trim().First().ToString().ToUpper() + str.Remove(0, 1));
+                }
+                var newTag = string.Join("", newTagArray);
+                if (!newTagsArray.Contains(newTag) && newTag.ToLower() != "allclearance") newTagsArray.Add(newTag);
+            }            
+            return string.Join(",", newTagsArray);
+        }
+        //Format Handle
+        private string FormatHandle(string handle)
+        {
+            var illegalChars = handle.Trim().ToCharArray().ToList().FindAll(c => !char.IsLetter(c) && c != char.Parse("-"));
+            foreach (var illegalChar in illegalChars)
+            {
+                handle = handle.Replace(illegalChar, char.Parse("-"));
+            }
+            return handle.Replace("---", "-").Replace("--", "-").ToLower();
+        }
+        //Format Image ALT Tag
+        private string FormatAltTag(string altTagHandle, string altTagDescription)
+        {  
+            return $"Image of product {altTagHandle}. {altTagDescription}.";
+        }
+        //Set column width to column content width or 200, whichever is less
+        private void FormatColumns(DataGridView dataGridView)
+        {
+            for (int i = 0; i < dataGridView.Columns.Count; i++)
+            {
+                var column = dataGridView.Columns[i];
+                var width = TextRenderer.MeasureText(column.HeaderText, dataGridView.ColumnHeadersDefaultCellStyle.Font).Width;
+                column.MinimumWidth = 50;
+                column.Width = width > 200 ? 200 : width;
+            }
+            var n = dataGridView.RowCount < 100 ? dataGridView.RowCount : 100;
+            for (int i = 0; i < n; i++)
+            {
+                try
+                {
+                    var cells = (dataGridView.Rows[i]).Cells;
+                    for (int j = 0; j < cells.Count; j++)
+                    {
+                        var column = dataGridView.Columns[j];
+                        column.SortMode = DataGridViewColumnSortMode.NotSortable;
+                        var cell = (dataGridView.Rows[i]).Cells[j];
+                        if (cell.Value == null || cell == null || cell.Value == DBNull.Value) continue;
+                        var width = TextRenderer.MeasureText((string)cell.Value, cell.Style.Font).Width;
+                        column.MinimumWidth = 50;
+                        column.Width = width > 200 ? 200 : width > column.Width ? width : column.Width;
+                    }
+                }
+                catch (Exception) { }
+            }
         }
     }
 

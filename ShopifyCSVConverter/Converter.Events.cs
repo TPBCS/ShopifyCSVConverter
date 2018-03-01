@@ -93,6 +93,9 @@ namespace ShopifyCSVConverter
             {
                 foreach (var row in originalDataTable.Rows)
                 {
+                    var stockType = ((DataRow)row).ItemArray[7].ToString().ToLower();
+                    var stockLevel = ((DataRow)row).ItemArray[8].ToString().ToLower();
+                    if (stockType == "discontinued" || stockLevel != "green") continue;
                     try
                     {
                         var rowItems = ((DataRow)row).ItemArray.Cast<string>().ToArray();
@@ -101,7 +104,8 @@ namespace ShopifyCSVConverter
                         {
                             if (boxIndexes[i] == 0) continue;
                             var key = boxValues[i];
-                            newRowItems[i] = rowItems[hash100[key] - 1];
+                            newRowItems[i] = i == 0 ? FormatHandle(rowItems[hash100[key] - 1]) : i == 1 ? CapitalizeWords(rowItems[hash100[key] - 1]) : i == 5 ? 
+                            FormatTags(rowItems[hash100[key] - 1]) : i == 25 ? FormatAltTag(newRowItems[0], rowItems[hash100[key] - 1]) : rowItems[hash100[key] - 1];
                         }
                         newDataTable.LoadDataRow(newRowItems, true);
                         if(toolStripProgressBar1.GetCurrentParent().InvokeRequired) toolStripProgressBar1.GetCurrentParent().Invoke((Action)(() => toolStripProgressBar1.PerformStep()));
@@ -115,41 +119,6 @@ namespace ShopifyCSVConverter
             toolStripProgressBar1.Visible = false;
             toolStripStatusLabel1.Text = "Ready";
             saveToolStripMenuItem.Enabled = true;
-        }
-        //Set column width to column content width or 200, whichever is less
-        private void FormatColumns(DataGridView dataGridView)
-        {
-            for (int i = 0; i < dataGridView.Columns.Count; i++)
-            {
-                var column = dataGridView.Columns[i];
-                var width = TextRenderer.MeasureText(column.HeaderText, dataGridView.ColumnHeadersDefaultCellStyle.Font).Width;
-                column.MinimumWidth = 50;
-                column.Width = width > 200 ? 200 : width;
-            }
-            var n = dataGridView.RowCount < 100 ? dataGridView.RowCount : 100;
-            for (int i = 0; i < n; i++)
-            {
-                try
-                {
-                    var cells = (dataGridView.Rows[i]).Cells;
-                    for (int j = 0; j < cells.Count; j++)
-                    {
-                        var column = dataGridView.Columns[j];
-                        column.SortMode = DataGridViewColumnSortMode.NotSortable;
-                        var cell = (dataGridView.Rows[i]).Cells[j];
-                        if (cell.Value == null || cell == null || cell.Value == DBNull.Value) continue;
-                        var width = TextRenderer.MeasureText((string)cell.Value, cell.Style.Font).Width;
-                        column.MinimumWidth = 50;
-                        column.Width = width > 200 ? 200 : width > column.Width ? width : column.Width;
-                    }
-                }
-                catch (Exception ex)
-                {
-#if DEBUG
-                    MessageBox.Show($"{ex.Message} {ex.StackTrace}", "Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
-#endif
-                }                
-            }
         }
         //Save converted file
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
